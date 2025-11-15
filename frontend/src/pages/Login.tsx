@@ -43,7 +43,7 @@ export default function Login() {
           setAuth(data.token, data.username)
         }
         localStorage.removeItem('registerSuccess')
-        navigate('/')
+        navigate('/products')
       } else if (res.status === 401) {
         setError('Sai email hoặc mật khẩu')
       } else {
