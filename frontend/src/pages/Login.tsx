@@ -13,7 +13,6 @@ export default function Login() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // show register success message if redirected from register
     const succ = localStorage.getItem('registerSuccess')
     if (succ === 'true') {
       setInfo('Đăng kí thành công. Vui lòng đăng nhập.')
@@ -32,7 +31,6 @@ export default function Login() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // backend expect: { username, password }
         body: JSON.stringify({
           username: email,
           password: password,
@@ -40,12 +38,10 @@ export default function Login() {
       })
 
       if (res.ok) {
-        // backend returns JSON { token, userId, username }
         const data = await res.json()
         if (data && data.token) {
           setAuth(data.token, data.username)
         }
-        // clear any register info
         localStorage.removeItem('registerSuccess')
         navigate('/')
       } else if (res.status === 401) {
@@ -64,51 +60,94 @@ export default function Login() {
   }
 
   return (
-    <div className="max-w-md mx-auto mt-16 p-6 bg-white/5 rounded-lg shadow-sm">
-      <h2 className="text-2xl font-semibold mb-4">Đăng nhập</h2>
-
-      {info && <div className="text-green-600 mb-3">{info}</div>}
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Email</label>
-          <input
-            type="text"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white/90 text-black"
-          />
+    <div className="min-h-screen flex items-center justify-center  from-slate-900 via-slate-950 to-slate-900 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo + Title */}
+        <div className="flex flex-col items-center mb-6">
+          <h1 className="text-2xl font-semibold text-white tracking-tight">
+            Đăng nhập tài khoản
+          </h1>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Mật khẩu</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white/90 text-black"
-            placeholder="••••••••"
-          />
-        </div>
+        {/* Card Container */}
+        <div className="bg-blue-900 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl px-6 py-7 space-y-5">
+          {/* Info / Success */}
+          {info && (
+            <div className="flex items-start gap-2 rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-200">
+              <span className="mt-0.5 text-lg">✔</span>
+              <span>{info}</span>
+            </div>
+          )}
 
-        {error && <div className="text-red-600 text-sm">{error}</div>}
+          {/* Error */}
+          {error && (
+            <div className="flex items-start gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-3 py-2.5 text-sm text-red-200">
+              <span className="mt-0.5 text-lg">!</span>
+              <span>{error}</span>
+            </div>
+          )}
 
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 bg-indigo-600 text-black rounded-md hover:bg-indigo-700 disabled:opacity-60"
-          >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-          </button>
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-200">
-            quay về trang chủ
-          </Link>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className=" block text-sm font-medium text-slate-200">
+                Email
+              </label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                // autoComplete="email"
+                className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-slate-200">
+                  Mật khẩu
+                </label>
+  
+              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-blue-500 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+            </button>
+          </form>
+
+          <div className="pt-2 space-y-2 text-center">
+            <p className="text-xs text-slate-400">
+              Chưa có tài khoản?{' '}
+              <Link
+                to="/register"
+                className="font-medium text-blue-400 hover:text-blue-300"
+              >
+                Đăng ký ngay
+              </Link>
+            </p>
+            <Link
+              to="/"
+              className=" inline-flex items-center justify-center text-xs text-slate-400 hover:text-slate-200"
+            >
+              <span className="mr-1  text-blue-400 hover:text-blue-300">Quay về trang chủ</span > 
+            </Link>
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   )
 }
-
