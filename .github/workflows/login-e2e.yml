@@ -10,10 +10,6 @@ jobs:
   login-e2e:
     runs-on: ubuntu-latest
 
-    # defaults:
-    #   run:
-    #     working-directory: frontend   
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,16 +22,17 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
+        working-directory: frontend          # 👈 add this
         run: npm ci
 
       - name: Run Cypress login tests
         uses: cypress-io/github-action@v6
         with:
-            working-directory: frontend      
-            install: false
-            start: npm run dev              
-            wait-on: 'http://localhost:5173'
-            command: npm run test:e2e:ci
+          working-directory: frontend        # 👈 correct
+          install: false
+          start: npm run dev                 # start Vite dev server
+          wait-on: 'http://localhost:5173'   # wait until app is ready
+          command: npm run test:e2e:ci       # runs cypress tests
 
       - name: Upload Cypress artifacts (screenshots/videos)
         if: always()
