@@ -6,8 +6,8 @@ import {
   createProduct as apiCreateProduct,
   updateProduct as apiUpdateProduct,
   deleteProduct as apiDeleteProduct,
-  ProductDto,
 } from '../services/productService'
+import type { ProductDto } from '../services/productService'
 
 type Product = ProductDto
 

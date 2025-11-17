@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { setAuth } from '../utils/auth'
-
-const API_BASE_URL = 'http://localhost:8080' // backend Spring Boot
+import { login as apiLogin } from '../services/authService'
 
 export default function Login() {
   const [email, setEmail] = useState<string>('')
@@ -26,34 +25,19 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: email,
-          password: password,
-        }),
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        if (data && data.token) {
-          setAuth(data.token, data.username)
-        }
-        localStorage.removeItem('registerSuccess')
-        navigate('/products')
-      } else if (res.status === 401) {
+      const data = await apiLogin(email, password)
+      if (data && data.token) {
+        setAuth(data.token, data.username)
+      }
+      localStorage.removeItem('registerSuccess')
+      navigate('/products')
+    } catch (err: any) {
+      console.error(err)
+      if (err.message === 'Unauthorized') {
         setError('Sai email hoặc mật khẩu')
       } else {
-        const text = await res.text()
-        console.error('Login error:', text)
-        setError('Có lỗi xảy ra, vui lòng thử lại')
+        setError(err.message || 'Không kết nối được tới server')
       }
-    } catch (err) {
-      console.error(err)
-      setError('Không kết nối được tới server')
     } finally {
       setLoading(false)
     }
