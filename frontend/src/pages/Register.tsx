@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-
-const API_BASE_URL = 'http://localhost:8080'
+import { register as apiRegister } from '../services/authService'
 
 export default function Register() {
 	const [username, setUsername] = useState<string>('')
@@ -26,22 +25,13 @@ export default function Register() {
 
 		setLoading(true)
 		try {
-			const res = await fetch(`${API_BASE_URL}/api/auth/register`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ username: username, password: password }),
-			})
-
-			if (res.ok) {
-				localStorage.setItem('registerSuccess', 'true')
-				navigate('/login')
-			} else {
-				const text = await res.text()
-				setError(text || 'Đăng kí thất bại')
-			}
-		} catch (err) {
+			await apiRegister(username, password)
+			// service returns server message on success; keep a flag for login page
+			localStorage.setItem('registerSuccess', 'true')
+			navigate('/login')
+		} catch (err: any) {
 			console.error(err)
-			setError('Không kết nối được tới server')
+			setError(err.message || 'Đăng kí thất bại')
 		} finally {
 			setLoading(false)
 		}
