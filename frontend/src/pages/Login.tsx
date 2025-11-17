@@ -5,7 +5,7 @@ import { login as apiLogin } from '../services/authService'
 import { consumeRegisterSuccess, parseLoginError } from '../utils/loginUtils'
 
 export default function Login() {
-  const [email, setEmail] = useState<string>('')
+  const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +23,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const data = await apiLogin(email, password)
+      const data = await apiLogin(username, password)
       if (data && data.token) {
         setAuth(data.token, data.username)
       }
@@ -47,9 +47,7 @@ export default function Login() {
           </h1>
         </div>
 
-        {/* Card Container */}
         <div className="bg-blue-900 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl px-6 py-7 space-y-5">
-          {/* Info / Success */}
           {info && (
             <div className="flex items-start gap-2 rounded-lg border border-emerald-500/50 bg-emerald-500/10 px-3 py-2.5 text-sm text-emerald-200">
               <span className="mt-0.5 text-lg">✔</span>
@@ -68,12 +66,12 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className=" block text-sm font-medium text-slate-200">
-                Email
+                username
               </label>
               <input
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
                 // autoComplete="email"
                 className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"

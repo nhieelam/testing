@@ -49,6 +49,13 @@ export default function Register() {
 
 				{/* Card Container */}
 				<div className="bg-blue-900 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl px-6 py-7 space-y-5">
+					{/* Rules Note */}
+					<div className="text-sm text-slate-300 px-1">
+						<ul className="list-disc pl-5">
+							<li>Username: 3-50 ký tự, chỉ chứa a-z, A-Z, 0-9, '-', '.', '_'</li>
+							<li>Mật khẩu: 6-100 ký tự, phải có cả chữ và số</li>
+						</ul>
+					</div>
 					{/* Error */}
 					{error && (
 						<div className="flex items-start gap-2 rounded-lg border border-red-500/60 bg-red-500/10 px-3 py-2.5 text-sm text-red-200">
