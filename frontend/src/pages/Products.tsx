@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isAuthenticated } from '../utils/auth'
+import { formatPrice, emptyNewProduct, toProductPayload, validateProductPayload } from '../utils/productUtils'
 import {
   getProducts as apiGetProducts,
   createProduct as apiCreateProduct,
@@ -22,13 +23,7 @@ export default function Products() {
   const [saving, setSaving] = useState<boolean>(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState<boolean>(false)
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
-    name: '',
-    description: '',
-    price: 0,
-    stockQuantity: 0,
-    status: 'ACTIVE',
-  })
+  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(emptyNewProduct())
   const [creating, setCreating] = useState<boolean>(false)
 
   // Fetch products from API (via service)
@@ -136,18 +131,20 @@ export default function Products() {
     try {
       setCreating(true)
       setError(null)
-      await apiCreateProduct(newProduct)
+
+      const payload = toProductPayload(newProduct)
+      const validation = validateProductPayload(payload)
+      if (!validation.valid) {
+        setError(validation.error || 'Dữ liệu sản phẩm không hợp lệ')
+        return
+      }
+
+      await apiCreateProduct(payload)
 
       // Refresh the product list
       await fetchProducts()
       setShowAddForm(false)
-      setNewProduct({
-        name: '',
-        description: '',
-        price: 0,
-        stockQuantity: 0,
-        status: 'ACTIVE',
-      })
+      setNewProduct(emptyNewProduct())
     } catch (err) {
       console.error('Error creating product:', err)
       setError('Không thể tạo sản phẩm. Vui lòng thử lại.')
@@ -156,12 +153,7 @@ export default function Products() {
     }
   }
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(price)
-  }
+  // formatPrice is provided by utils/productUtils
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
