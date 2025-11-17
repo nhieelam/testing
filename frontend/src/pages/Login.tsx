@@ -5,133 +5,12 @@ import { login as apiLogin } from '../services/authService'
 import { consumeRegisterSuccess, parseLoginError } from '../utils/loginUtils'
 
 export default function Login() {
-  const [email, setEmail] = useState<string>('')
-  const [password, setPassword] = useState<string>('')
-  const [loading, setLoading] = useState<boolean>(false)
-  const [error, setError] = useState<string | null>(null)
-  const [info, setInfo] = useState<string | null>(null)
-  const [emailError, setEmailError] = useState<string | null>(null)
-  const [passwordError, setPasswordError] = useState<string | null>(null)
-  const [remember, setRemember] = useState<boolean>(false)
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    const msg = consumeRegisterSuccess()
-    if (msg) setInfo(msg)
-  }, [])
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
-    setEmailError(null)
-    setPasswordError(null)
-    setLoading(true)
-
-    // client-side validation
-    if (!email || email.trim().length === 0) {
-      setEmailError('Email là bắt buộc')
-    } else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setEmailError('Email không hợp lệ')
-    }
-    if (!password || password.length === 0) {
-      setPasswordError('Mật khẩu là bắt buộc')
-    } else if (password.length < 6) {
-      setPasswordError('Mật khẩu tối thiểu 6 ký tự')
-    }
-
-    if (emailError || passwordError) {
-      setLoading(false)
-      return
-    }
-
-    try {
-      const data = await apiLogin(email, password)
-      if (data && data.token) {
-        // persist if remember checked
-        setAuth(data.token, data.username || (data as any).user?.email, remember)
-      }
-      localStorage.removeItem('registerSuccess')
-      navigate('/products')
-    } catch (err: any) {
-      console.error(err)
-      setError(parseLoginError(err))
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="flex flex-col items-center mb-6">
-          <h1 className="text-2xl font-semibold text-slate-900 tracking-tight">Đăng nhập tài khoản</h1>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow px-6 py-7 space-y-5">
-          {info && (
-            <div className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-sm text-emerald-700">
-              <span className="mt-0.5 text-lg">✔</span>
-              <span>{info}</span>
-            </div>
-          )}
-
-          {error && (
-            <div data-test="login-error" className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
-              <span className="mt-0.5 text-lg">!</span>
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-slate-700">Email</label>
-              <input data-test="login-email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-lg border px-3 py-2" />
-              {emailError && <p data-test="login-email-error" className="text-xs text-red-600 mt-1">{emailError}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-slate-700">Mật khẩu</label>
-              <input data-test="login-password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-lg border px-3 py-2" />
-              {passwordError && <p data-test="login-password-error" className="text-xs text-red-600 mt-1">{passwordError}</p>}
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label className="inline-flex items-center text-sm text-slate-700">
-                <input data-test="login-remember" type="checkbox" className="mr-2" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-                Ghi nhớ đăng nhập
-              </label>
-
-              <button type="button" data-test="toggle-password" className="text-sm text-slate-600" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? 'Ẩn' : 'Hiện'}
-              </button>
-            </div>
-
-            <button data-test="login-submit" type="submit" disabled={loading} className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg">
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-            </button>
-          </form>
-
-          <div className="pt-2 text-center">
-            <p className="text-xs text-slate-500">Chưa có tài khoản? <Link to="/register" className="text-blue-600">Đăng ký ngay</Link></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { setAuth } from '../utils/auth'
-import { login as apiLogin } from '../services/authService'
-import { consumeRegisterSuccess, parseLoginError } from '../utils/loginUtils'
-
-export default function Login() {
   const [username, setUsername] = useState<string>('')
   const [password, setPassword] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState<boolean>(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -197,7 +76,7 @@ export default function Login() {
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 placeholder="Tên đăng nhập"
-                // autoComplete="email"
+                // autoComplete="username"
                 className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
               />
             </div>
@@ -209,16 +88,25 @@ export default function Login() {
                 </label>
   
               </div>
-              <input
-                type="password"
-                data-text="login-password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-                className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  data-text="login-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="w-full rounded-lg border border-slate-700 bg-slate-900/60 px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/60"
+                  placeholder="••••••••"
+                />
+                <p
+                  data-text="toggle-password"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-xs cursor-pointer text-black px-2 py-1 rounded"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </p>
+              </div>
             </div>
 
             <button

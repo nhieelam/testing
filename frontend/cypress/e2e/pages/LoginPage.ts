@@ -9,31 +9,31 @@ export class LoginPage {
   }
 
   passwordInput() {
-    return cy.get('[data-test="login-password"]');
+    return cy.get('[data-text="login-password"]');
   }
 
   submitButton() {
-    return cy.get('[data-test="login-submit"]');
+    return cy.get('[data-text="login-submit"]');
   }
 
   rememberMeCheckbox() {
-    return cy.get('[data-test="login-remember"]');
+    return cy.get('[data-text="login-remember"]');
   }
 
   showPasswordButton() {
-    return cy.get('[data-test="toggle-password"]');
+    return cy.get('[data-text="toggle-password"]');
   }
 
   errorMessage() {
-    return cy.get('[data-test="login-error"]');
+    return cy.get('[data-text="login-error"]');
   }
 
   validationMessage(field: "email" | "password") {
-    return cy.get(`[data-test="login-${field}-error"]`);
+    return cy.get(`[data-text="login-${field}-error"]`);
   }
 
-  fillForm(email: string, password: string) {
-    this.emailInput().clear().type(email);
+  fillForm(username: string, password: string) {
+    this.emailInput().clear().type(username);
     this.passwordInput().clear().type(password);
   }
 
