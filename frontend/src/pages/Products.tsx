@@ -25,6 +25,7 @@ export default function Products() {
   const [showAddForm, setShowAddForm] = useState<boolean>(false)
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(emptyNewProduct())
   const [creating, setCreating] = useState<boolean>(false)
+  const [searchTerm, setSearchTerm] = useState<string>('')
 
   // Fetch products from API (via service)
   const fetchProducts = useCallback(async () => {
@@ -154,22 +155,36 @@ export default function Products() {
   }
 
   // formatPrice is provided by utils/productUtils
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-lg shadow-sm border border-slate-200">
-          <div className="px-6 py-4 border-b border-slate-200 flex justify-between items-center">
+          <div className="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold text-slate-900">Danh sách sản phẩm</h1>
               <p className="text-sm text-slate-500 mt-1">Quản lý và chỉnh sửa thông tin sản phẩm</p>
             </div>
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-            >
-              {showAddForm ? 'Hủy' : '+ Thêm sản phẩm'}
-            </button>
+            <div className="flex flex-col md:flex-row gap-2 md:items-center">
+              <input
+                type="text"
+                placeholder="Tìm kiếm theo tên sản phẩm..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-text="product-search-input"
+                className="w-full md:w-64 px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={() => setShowAddForm(!showAddForm)}
+                data-text="product-create-button"
+                className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+              >
+                {showAddForm ? 'Hủy' : '+ Thêm sản phẩm'}
+              </button>
+            </div>
           </div>
 
           {/* Error Message */}
@@ -192,6 +207,7 @@ export default function Products() {
                     onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Nhập tên sản phẩm"
+                    data-text="product-name-input"
                   />
                 </div>
                 <div>
@@ -212,6 +228,7 @@ export default function Products() {
                     onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
+                    data-text="product-price-input"
                   />
                 </div>
                 <div>
@@ -222,6 +239,7 @@ export default function Products() {
                     onChange={(e) => setNewProduct({ ...newProduct, stockQuantity: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="0"
+                    data-text="product-quantity-input"
                   />
                 </div>
                 <div>
@@ -239,6 +257,7 @@ export default function Products() {
                 <button
                   onClick={handleCreate}
                   disabled={creating}
+                  data-text="product-submit-button"
                   className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {creating ? 'Đang tạo...' : 'Tạo sản phẩm'}
@@ -254,6 +273,7 @@ export default function Products() {
                       status: 'ACTIVE',
                     })
                   }}
+                  data-text="product-cancel-button"
                   className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-medium rounded-md hover:bg-slate-300 transition-colors"
                 >
                   Hủy
@@ -300,8 +320,12 @@ export default function Products() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {products.map((product) => (
-                  <tr key={product.id} className="hover:bg-slate-50 transition-colors">
+                {filteredProducts.map((product) => (
+                  <tr
+                    key={product.id}
+                    className="hover:bg-slate-50 transition-colors"
+                    data-text="product-row"
+                  >
                     {editingId === product.id ? (
                       <>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
@@ -394,6 +418,7 @@ export default function Products() {
                             <button
                               onClick={() => handleEdit(product)}
                               className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                              data-text="product-edit-button"
                             >
                               Sửa
                             </button>
@@ -401,6 +426,7 @@ export default function Products() {
                               onClick={() => handleDelete(product.id)}
                               disabled={deleting === product.id}
                               className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              data-text="product-delete-button"
                             >
                               {deleting === product.id ? 'Đang xóa...' : 'Xóa'}
                             </button>

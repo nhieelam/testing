@@ -7,33 +7,40 @@ export class ProductListPage {
 
   // Table / list
   rows() {
-    return cy.get('[data-test="product-row"]');
+    return cy.get('[data-text="product-row"]');
   }
 
   rowByName(name: string) {
-    return this.rows().contains(name).parent(); // tuỳ cấu trúc table
+    // Tìm cell chứa tên, sau đó lấy ra cả dòng (tr) tương ứng
+    return cy
+      .contains('[data-text="product-row"] td, [data-text="product-row"] th', name)
+      .closest('[data-text="product-row"]');
   }
 
   // Buttons / actions
   createButton() {
-    return cy.get('[data-test="product-create-button"]');
+    return cy.get('[data-text="product-create-button"]');
   }
 
   editButtonFor(name: string) {
-    return this.rowByName(name).find('[data-test="product-edit-button"]');
+    return this.rowByName(name).find('[data-text="product-edit-button"]');
   }
 
   deleteButtonFor(name: string) {
-    return this.rowByName(name).find('[data-test="product-delete-button"]');
+    // Tìm đúng row chứa tên, rồi tìm nút xóa trong dòng đó
+    return cy
+      .contains('[data-text="product-row"] td, [data-text="product-row"] th', name)
+      .closest('[data-text="product-row"]')
+      .find('[data-text="product-delete-button"]');
   }
 
   confirmDeleteButton() {
-    return cy.get('[data-test="confirm-delete-button"]');
+    return cy.get('[data-text="confirm-delete-button"]');
   }
 
   // Search / filter
   searchInput() {
-    return cy.get('[data-test="product-search-input"]');
+    return cy.get('[data-text="product-search-input"]');
   }
 
   search(name: string) {

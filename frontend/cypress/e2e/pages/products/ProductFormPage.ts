@@ -2,27 +2,27 @@
 
 export class ProductFormPage {
   nameInput() {
-    return cy.get('[data-test="product-name-input"]');
+    return cy.get('[data-text="product-name-input"]');
   }
 
   priceInput() {
-    return cy.get('[data-test="product-price-input"]');
+    return cy.get('[data-text="product-price-input"]');
   }
 
   quantityInput() {
-    return cy.get('[data-test="product-quantity-input"]');
+    return cy.get('[data-text="product-quantity-input"]');
   }
 
   submitButton() {
-    return cy.get('[data-test="product-submit-button"]');
+    return cy.get('[data-text="product-submit-button"]');
   }
 
   cancelButton() {
-    return cy.get('[data-test="product-cancel-button"]');
+    return cy.get('[data-text="product-cancel-button"]');
   }
 
   validationMessage(field: "name" | "price" | "quantity") {
-    return cy.get(`[data-test="product-${field}-error"]`);
+    return cy.get(`[data-text="product-${field}-error"]`);
   }
 
   fillForm(data: {
