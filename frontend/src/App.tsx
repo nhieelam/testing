@@ -66,20 +66,27 @@ function Home() {
         )}
 
         <div className="mt-4 pt-4 border-t border-slate-200">
-          <p className="text-xs text-slate-400 mb-2">
-            {token
-              ? 'Bạn đã đăng nhập, bấm để xem sản phẩm:'
-              : 'Sau khi đăng nhập, bạn có thể:'}
-          </p>
-
-          {/* Nút xem sản phẩm (có thể cho phép luôn, hoặc tùy bạn cho phép chỉ khi đã login) */}
-          <Link
-            to="/products"
-            className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
-          >
-            Xem danh sách sản phẩm
-          </Link>
+          {token ? (
+            <>
+              <p className="text-xs text-slate-400 mb-2">
+                Bấm để xem sản phẩm:
+              </p>
+              <Link
+                to="/products"
+                className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
+              >
+                Xem danh sách sản phẩm
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-slate-500">
+                Hãy đăng nhập
+              </p>
+            </>
+          )}
         </div>
+
       </div>
     </div>
   )
