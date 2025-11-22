@@ -19,7 +19,7 @@ import com.example.demo.repository.ProductRepository;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin // cho phép FE gọi từ domain khác (localhost:3000,...)
+@CrossOrigin 
 public class ProductController {
 
     private final ProductRepository productRepository;
@@ -28,52 +28,47 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    // GET /api/products
     @GetMapping
     public List<Product> getAll() {
         return productRepository.findAll();
     }
 
-    // GET /api/products/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getById(@PathVariable UUID id) {
-        return productRepository.findById(id)
-                .map(ResponseEntity::ok)              // 200
-                .orElse(ResponseEntity.notFound().build()); // 404
+    public ResponseEntity<Product> getById(@PathVariable UUID id) { 
+        return productRepository.findById(id) 
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /api/products
     @PostMapping
     public Product create(@RequestBody Product product) {
-        // id sẽ tự random trong @PrePersist nếu null
         return productRepository.save(product);
     }
 
-    // PUT /api/products/{id}
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(
-            @PathVariable UUID id,
+            @PathVariable UUID id, 
             @RequestBody Product payload
     ) {
-        return productRepository.findById(id)
+        return productRepository.findById(id) 
                 .map(existing -> {
                     existing.setName(payload.getName());
                     existing.setDescription(payload.getDescription());
                     existing.setPrice(payload.getPrice());
-                    existing.setStockQuantity(payload.getStockQuantity());
+                    // SỬA Ở ĐÂY: Dùng đúng tên method từ Entity
+                    existing.setStockQuantity(payload.getStockQuantity()); 
                     existing.setStatus(payload.getStatus());
                     return ResponseEntity.ok(productRepository.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /api/products/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        if (!productRepository.existsById(id)) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) { 
+        if (!productRepository.existsById(id)) { 
             return ResponseEntity.notFound().build();
         }
-        productRepository.deleteById(id);
-        return ResponseEntity.noContent().build(); // 204
+        productRepository.deleteById(id); 
+        return ResponseEntity.noContent().build();
     }
 }
