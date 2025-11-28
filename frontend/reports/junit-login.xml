@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="44.587" tests="9" failures="9">
+  <testsuite name="Root Suite" timestamp="2025-11-16T12:57:20" tests="0" file="cypress\e2e\login.cy.ts" time="0.000" failures="0">
+  </testsuite>
+  <testsuite name="E2E - Login flow" timestamp="2025-11-16T12:57:20" tests="9" time="44.584" failures="9">
+    <testcase name="E2E - Login flow a) Complete login flow with valid credentials" time="0.000" classname="a) Complete login flow with valid credentials">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:30:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow b1) Hiển thị lỗi khi để trống email &amp; password" time="0.000" classname="b1) Hiển thị lỗi khi để trống email &amp; password">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-submit&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-submit"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.submitButton (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:16:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.submit (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:41:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:52:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow b2) Hiển thị lỗi khi email không hợp lệ" time="0.000" classname="b2) Hiển thị lỗi khi email không hợp lệ">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:65:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow b3) Hiển thị lỗi khi mật khẩu quá ngắn" time="0.000" classname="b3) Hiển thị lỗi khi mật khẩu quá ngắn">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:75:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow c1) Login thành công" time="0.000" classname="c1) Login thành công">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:91:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow c2) Login sai mật khẩu -&gt; hiển thị thông báo lỗi" time="0.000" classname="c2) Login sai mật khẩu -&gt; hiển thị thông báo lỗi">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:104:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow d1) Nút show/hide password hoạt động đúng" time="0.000" classname="d1) Nút show/hide password hoạt động đúng">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-password&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-password"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.passwordInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:12:14)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:117:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow d2) Remember me ảnh hưởng nơi lưu token" time="0.000" classname="d2) Remember me ảnh hưởng nơi lưu token">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:138:14)]]></failure>
+    </testcase>
+    <testcase name="E2E - Login flow d3) Button bị disable khi đang submit" time="0.000" classname="d3) Button bị disable khi đang submit">
+      <failure message="Timed out retrying after 4000ms: Expected to find element: `[data-test=&quot;login-email&quot;]`, but never found it." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find element: `[data-test="login-email"]`, but never found it.
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.emailInput (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:8:14)
+    at __webpack_modules__../cypress/e2e/pages/LoginPage.ts.LoginPage.fillForm (webpack://vite-project/./cypress/e2e/pages/LoginPage.ts:36:9)
+    at Context.eval (webpack://vite-project/./cypress/e2e/login.cy.ts:157:14)]]></failure>
+    </testcase>
+  </testsuite>
+</testsuites>
