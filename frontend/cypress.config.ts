@@ -10,6 +10,8 @@ export default defineConfig({
     },
     viewportWidth: 1280,
     viewportHeight: 720,
+    screenshotOnRunFailure: true,  // hoặc không set thì default là true
+    video: true,     
   },
   env: {
     API_URL: "http://localhost:8080/api"
@@ -18,7 +20,7 @@ export default defineConfig({
   reporterOptions: {
     reportDir: "cypress/reports",
     overwrite: false,
-    html: false,  
-    json: true
-  }
+    html: false,
+    json: true,
+  },
 });

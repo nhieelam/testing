@@ -56,6 +56,10 @@ describe("E2E - Login flow", () => {
       .should("be.visible")
       .and("contain", "Mật khẩu là bắt buộc");
   });
+  it('should fail to test screenshot', () => {
+    expect(true).to.equal(false)
+  })
+  
 
   it("b2) Hiển thị lỗi khi tên đăng nhập không hợp lệ", () => {
     loginPage.fillForm("sai-dinh-dang", "Password123");
