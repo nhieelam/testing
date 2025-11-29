@@ -13,5 +13,12 @@ export default defineConfig({
   },
   env: {
     API_URL: "http://localhost:8080/api"
+  },
+  reporter: "mochawesome",
+  reporterOptions: {
+    reportDir: "cypress/reports",
+    overwrite: false,
+    html: false,  
+    json: true
   }
 });
