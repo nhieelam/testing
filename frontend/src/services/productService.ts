@@ -62,7 +62,19 @@ export async function updateProduct(id: string, payload: Omit<ProductDto, 'id'>)
 
   return res.json()
 }
+export async function getProductById(id: string): Promise<ProductDto> {
+  const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
+    method: 'GET',
+    headers: authHeaders(),
+  })
 
+  if (!res.ok) {
+    const text = await res.text().catch(() => '')
+    throw new Error(text || 'Failed to fetch product')
+  }
+
+  return res.json()
+}
 export async function deleteProduct(id: string): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/api/products/${id}`, {
     method: 'DELETE',
