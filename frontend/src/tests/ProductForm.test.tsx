@@ -10,7 +10,7 @@ import { vi } from 'vitest';
 
 // SỬA: Mock productUtils
 vi.mock('../utils/productUtils', () => ({
-  validateProductPayload: vi.fn(), 
+  validateProductPayload: vi.fn(),
   emptyNewProduct: vi.fn(),
   toProductPayload: vi.fn(),
   formatPrice: vi.fn((price) => `${price} VND`),
@@ -41,7 +41,7 @@ describe('Products Component - Form Validation Tests', () => {
     vi.clearAllMocks();
     mockedProductService.getProducts.mockResolvedValue([]);
     mockedIsAuthenticated.mockReturnValue(true);
-    
+
     // SETUP MOCK CƠ SỞ:
     mockedEmptyNewProduct.mockReturnValue({ name: '', description: '', price: 0, stockQuantity: 0, status: 'ACTIVE' });
     mockedToProductPayload.mockImplementation((p) => ({
@@ -52,7 +52,7 @@ describe('Products Component - Form Validation Tests', () => {
       status: p.status || 'ACTIVE',
     }));
     // SỬA: validation thành công chỉ cần { valid: true } (Khắc phục lỗi TS2322)
-    mockedValidatePayload.mockReturnValue({ valid: true }); 
+    mockedValidatePayload.mockReturnValue({ valid: true });
   });
 
   test('TC1: Hiển thị form Thêm sản phẩm khi nhấn nút', async () => {
@@ -70,7 +70,7 @@ describe('Products Component - Form Validation Tests', () => {
   test('TC2: Hiển thị lỗi validation khi submit form rỗng', async () => {
     mockedValidatePayload.mockReturnValue({
       valid: false,
-      error: 'Tên sản phẩm không được để trống', 
+      error: 'Tên sản phẩm không được để trống',
     });
 
     render(
@@ -89,8 +89,8 @@ describe('Products Component - Form Validation Tests', () => {
   });
 
   test('TC3: Không lỗi khi submit form hợp lệ', async () => {
-    mockedValidatePayload.mockReturnValue({ valid: true }); 
-    
+    mockedValidatePayload.mockReturnValue({ valid: true });
+
     mockedProductService.createProduct.mockResolvedValue({
       id: 'uuid-123',
       name: 'Điện thoại',
@@ -111,14 +111,14 @@ describe('Products Component - Form Validation Tests', () => {
     fireEvent.change(await screen.findByPlaceholderText('Nhập tên sản phẩm'), {
       target: { value: 'Laptop Dell' },
     });
-    
+
     // SỬA LỖI: Tìm input Price bằng cách sử dụng getAllByPlaceholderText ('0')[0]
-    const priceInput = screen.getAllByPlaceholderText('0')[0]; 
-    
+    const priceInput = screen.getAllByPlaceholderText('0')[0];
+
     fireEvent.change(priceInput, {
-        target: { value: '15000000' },
+      target: { value: '15000000' },
     });
-    
+
     fireEvent.click(screen.getByRole('button', { name: /tạo sản phẩm/i }));
 
     await waitFor(() => {

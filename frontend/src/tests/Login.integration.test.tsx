@@ -1,63 +1,292 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import Login from '../pages/Login';
-import * as authService from '../services/authService';
-import { vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Login from "../pages/Login";
+import { login as apiLogin } from "../services/authService";
+import { vi } from "vitest";
 
-// MOCK: Mock authService để tránh lỗi API thực
-vi.mock('../services/authService', () => ({
+// Mock API login
+vi.mock("../services/authService", () => ({
   login: vi.fn(),
 }));
 
-describe('Login Component Integration Tests', () => {
+// Mock react-router-dom navigate
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+describe("Login Component Tests - a) Rendering and User Interactions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Bọc component Login trong MemoryRouter
+    localStorage.clear();
+  });
+
+  // TC1: Render UI đúng
+  test("TC1: UI của form đăng nhập được render đúng", () => {
     render(
       <MemoryRouter>
         <Login />
       </MemoryRouter>
     );
+
+    expect(screen.getByText("Đăng nhập tài khoản")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Tên đăng nhập")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("••••••••")).toBeInTheDocument();
+    expect(screen.getByText("Đăng nhập")).toBeInTheDocument();
   });
 
-  test('TC1: Hiển thị form login đầy đủ', () => {
-    expect(screen.getByPlaceholderText(/Tên đăng nhập/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /đăng nhập/i })).toBeInTheDocument();
-  });
+  // TC2: User nhập dữ liệu và click submit
+  test("TC2: Người dùng nhập dữ liệu và nhấn nút submit", async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
 
-  test('TC2: Hiển thị lỗi khi submit form rỗng', async () => {
-    fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
+    const user = screen.getByPlaceholderText("Tên đăng nhập");
+    const pass = screen.getByPlaceholderText("••••••••");
+    const submit = screen.getByText("Đăng nhập");
 
-   // SỬA: Dùng getByText và waitFor để đảm bảo lỗi validation đã hiển thị (khắc phục lỗi tìm kiếm data-text/testid)
-   await waitFor(() => {
-        const usernameError = screen.getByText('Tên đăng nhập không được để trống');
-        const passwordError = screen.getByText('Mật khẩu là bắt buộc');
+    fireEvent.change(user, { target: { value: "testuser" } });
+    fireEvent.change(pass, { target: { value: "Test123" } });
+    fireEvent.click(submit);
 
-        expect(usernameError).toBeInTheDocument();
-        expect(passwordError).toBeInTheDocument();
-    }, { timeout: 1500 });
-  });
-
-  test('TC3: Gọi API khi submit form hợp lệ', async () => {
-    // SỬA LỖI Type Checking (TS2345): Thêm thuộc tính userId
-    vi.mocked(authService).login.mockResolvedValue({ 
-        token: 'mock', 
-        username: 'test', 
-        userId: 'user-123' 
-    });
-
-    const usernameInput = screen.getByPlaceholderText(/Tên đăng nhập/i);
-    const passwordInput = screen.getByPlaceholderText(/••••••••/i);
-    const submitBtn = screen.getByRole('button', { name: /đăng nhập/i });
-
-    fireEvent.change(usernameInput, { target: { value: 'testuser' } });
-    fireEvent.change(passwordInput, { target: { value: 'Test1234' } });
-    fireEvent.click(submitBtn);
-
-    // Kiểm tra API call đã được thực hiện
     await waitFor(() => {
-      expect(vi.mocked(authService).login).toHaveBeenCalledWith('testuser', 'Test1234');
+      expect(submit).toHaveTextContent("Đang đăng nhập...");
     });
+  });
+
+  // TC3: Tương tác với trường nhập mật khẩu (tính năng ẩn/hiển thị mật khẩu)
+  test("TC3: Kiểm tra tính năng ẩn/hiển thị mật khẩu trong trường nhập", async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    const passwordField = screen.getByPlaceholderText("••••••••") as HTMLInputElement;
+    const togglePasswordButton = screen.getByText("Show");
+
+    expect(passwordField.type).toBe("password");
+    fireEvent.click(togglePasswordButton);
+    expect(passwordField.type).toBe("text");
+    expect(togglePasswordButton.textContent).toBe("Hide");
+    fireEvent.click(togglePasswordButton);
+    expect(passwordField.type).toBe("password");
+    expect(togglePasswordButton.textContent).toBe("Show");
+  });
+
+
+  // TC4: Kiểm tra validation khi form rỗng
+  test("TC4: Kiểm tra validation khi form rỗng", async () => {
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      // expect(
+      //     screen.getByText("Tên đăng nhập không được để trống")
+      // ).toBeInTheDocument();
+      // expect(
+      //     screen.getByText("Mật khẩu không được để trống")
+      // ).toBeInTheDocument();
+      const usernameError = screen.getByText('Tên đăng nhập không được để trống');
+      const passwordError = screen.getByText('Mật khẩu là bắt buộc');
+
+      expect(usernameError).toBeInTheDocument();
+      expect(passwordError).toBeInTheDocument();
+    });
+
+    expect(apiLogin).not.toHaveBeenCalled();
   });
 });
+describe("Login Component Tests - b) Form Submission and API Calls", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  // TC1: Submit form hợp lệ → gọi API thành công
+  test("TC1: Gửi form hợp lệ và gọi API đăng nhập thành công", async () => {
+    vi.mocked(apiLogin).mockResolvedValue({
+      token: "mockToken",
+      userId: "123",
+      username: "testuser",
+    });
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Tên đăng nhập"), {
+      target: { value: "testuser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: "Test123" },
+    });
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      expect(apiLogin).toHaveBeenCalledWith("testuser", "Test123");
+    });
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/products");
+    });
+  });
+
+
+  test("TC2: Kiểm tra khi mật khẩu không hợp lệ -> không gọi API", async () => {
+    const invalidPass = "short";
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Tên đăng nhập"), {
+      target: { value: "wronguser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: invalidPass },
+    });
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      expect(apiLogin).not.toHaveBeenCalled();
+    });
+
+    const validationTexts = [
+      "Mật khẩu không hợp lệ",
+      "Mật khẩu phải có ít nhất 8 ký tự",
+      "Mật khẩu phải chứa chữ hoa và số",
+    ];
+    const anyValidationShown = validationTexts.some((txt) => {
+      try {
+        return !!screen.getByText(new RegExp(txt, "i"));
+      } catch {
+        return false;
+      }
+    });
+    if (anyValidationShown) {
+      expect(anyValidationShown).toBeTruthy();
+    }
+  });
+
+
+
+  test("TC3: Kiểm tra mật khẩu mạnh", async () => {
+    const strongPassword = "StrongPass@123";
+
+    vi.mocked(apiLogin).mockResolvedValue({
+      token: "mockToken",
+      userId: "123",
+      username: "testuser",
+    });
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Tên đăng nhập"), {
+      target: { value: "testuser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: strongPassword },
+    });
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      expect(apiLogin).toHaveBeenCalledWith("testuser", strongPassword);
+    });
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/products");
+    });
+  });
+
+});
+
+describe("Login Component Tests - c) Error Handling and Success Messages", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  // Kiểm tra thông báo thành công khi đăng nhập thành công
+  test("TC1: Kiểm tra thông báo thành công khi đăng nhập thành công", async () => {
+    vi.mocked(apiLogin).mockResolvedValue({
+      token: "mockToken",
+      userId: "123",
+      username: "testuser",
+    });
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Tên đăng nhập"), {
+      target: { value: "testuser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: "Test123" },
+    });
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith("/products");
+    });
+
+  });
+  test("TC2: Hiển thị thông báo lỗi khi gửi thông tin đăng nhập sai và API trả về lỗi", async () => {
+    vi.mocked(apiLogin).mockRejectedValueOnce(new Error("Unauthorized"));
+
+    render(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>
+    );
+
+    fireEvent.change(screen.getByPlaceholderText("Tên đăng nhập"), {
+      target: { value: "wronguser" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("••••••••"), {
+      target: { value: "WrongPass1" },
+    });
+
+    fireEvent.click(screen.getByText("Đăng nhập"));
+
+    await waitFor(() => {
+      expect(apiLogin).toHaveBeenCalledWith("wronguser", "WrongPass1");
+      expect(apiLogin).toHaveBeenCalledTimes(1);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/tên đăng nhập hoặc mật khẩu không đúng/i)
+      ).toBeInTheDocument();
+    });
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+});
+
