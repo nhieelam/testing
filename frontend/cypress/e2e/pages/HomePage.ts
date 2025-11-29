@@ -6,7 +6,7 @@ export class HomePage {
   getLogoutButton() {
     return cy.get("[data-text='logout-button']");
   }
-
+//
   clickLogout() {
     this.getLogoutButton().click();
   }
