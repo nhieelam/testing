@@ -2,9 +2,9 @@ name: login-e2e
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main,new ]
   pull_request:
-    branches: [ main ]
+    branches: [ main,new ]
 
 jobs:
   login-e2e:

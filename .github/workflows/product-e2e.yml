@@ -2,7 +2,9 @@ name: product-e2e
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main,new ]
+  pull_request:
+    branches: [ main,new ]
   workflow_dispatch:
 
 jobs:

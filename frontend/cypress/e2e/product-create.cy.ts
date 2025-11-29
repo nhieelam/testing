@@ -5,6 +5,9 @@ const listPage = new ProductListPage();
 const formPage = new ProductFormPage();
 
 describe("Product - Create / Edit / Delete", () => {
+  it('should fail to test screenshot', () => {
+    expect(true).to.equal(false)
+  })
   it("Create product successfully", () => {
     const newProduct = {
       id: "1",
