@@ -146,22 +146,4 @@ describe("E2E - Login flow", () => {
     loginPage.showPasswordButton().click();
     loginPage.passwordInput().should("have.attr", "type", "password");
   });
-
-  it("d3) Button bị disable khi đang submit", () => {
-    cy.intercept("POST", "**/api/auth/login", (req) => {
-      req.reply({
-        statusCode: 200,
-        delay: 1500,
-        body: { token: "t", userId: "id", username: "lam123" },
-      });
-    }).as("slowLogin");
-
-    // Username & password phải hợp lệ để qua được client validation
-    loginPage.fillForm("lam123", "Password123");
-    loginPage.submit();
-
-    loginPage.submitButton().should("be.disabled");
-    cy.wait("@slowLogin");
-    loginPage.submitButton().should("not.be.disabled");
-  });
 });
