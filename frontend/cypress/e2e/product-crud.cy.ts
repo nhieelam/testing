@@ -111,11 +111,13 @@ describe("Product - E2E CRUD Scenarios", () => {
     listPage.inlineSaveButton("Coca Cola").click();
 
     cy.wait("@updateProduct");
+    // Wait for the GET request that refreshes the list after update
+    cy.wait("@getProducts");
 
-    // kiểm tra UI đã update giá mới
+    // kiểm tra UI đã update giá mới (price is formatted as currency: 18000 -> "18.000 ₫" in Vietnamese locale)
     listPage
       .rowByName("Coca Cola")
-      .should("contain", "18000");
+      .should("contain", "18.000");
   });
 
   // d) Test Delete product (0.5 điểm)
@@ -126,8 +128,11 @@ describe("Product - E2E CRUD Scenarios", () => {
     listPage.deleteButtonFor("Pepsi").click();
 
     cy.wait("@deleteProduct");
+    // Wait for the GET request that refreshes the list after deletion
+    cy.wait("@getProducts");
 
-    listPage.rowByName("Pepsi").should("not.exist");
+    // Check that no rows contain "Pepsi"
+    listPage.rows().should("not.contain.text", "Pepsi");
   });
 
   // e) Test Search/Filter functionality (0.5 điểm)
@@ -137,6 +142,7 @@ describe("Product - E2E CRUD Scenarios", () => {
 
     listPage.rows().should("have.length", 1);
     listPage.rowByName("Coca Cola").should("exist");
-    listPage.rowByName("Pepsi").should("not.exist");
+    // Check that no rows contain "Pepsi"
+    listPage.rows().should("not.contain.text", "Pepsi");
   });
 });
