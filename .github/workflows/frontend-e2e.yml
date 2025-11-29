@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  login-e2e:
+  frontend-e2e:
     runs-on: ubuntu-latest
 
     steps:
