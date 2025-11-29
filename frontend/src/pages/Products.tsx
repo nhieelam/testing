@@ -4,6 +4,7 @@ import { isAuthenticated } from '../utils/auth'
 import { formatPrice, emptyNewProduct, toProductPayload, validateProductPayload } from '../utils/productUtils'
 import {
   getProducts as apiGetProducts,
+  getProductById as apiGetProductById,
   createProduct as apiCreateProduct,
   updateProduct as apiUpdateProduct,
   deleteProduct as apiDeleteProduct,
@@ -26,6 +27,9 @@ export default function Products() {
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>(emptyNewProduct())
   const [creating, setCreating] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState<string>('')
+  const [showDetailModal, setShowDetailModal] = useState<boolean>(false)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [loadingDetail, setLoadingDetail] = useState<boolean>(false)
 
   // Fetch products from API (via service)
   const fetchProducts = useCallback(async () => {
@@ -152,6 +156,26 @@ export default function Products() {
     } finally {
       setCreating(false)
     }
+  }
+
+  const handleViewDetails = async (id: string) => {
+    try {
+      setLoadingDetail(true)
+      setError(null)
+      const product = await apiGetProductById(id)
+      setSelectedProduct(product)
+      setShowDetailModal(true)
+    } catch (err) {
+      console.error('Error fetching product details:', err)
+      setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại.')
+    } finally {
+      setLoadingDetail(false)
+    }
+  }
+
+  const handleCloseDetailModal = () => {
+    setShowDetailModal(false)
+    setSelectedProduct(null)
   }
 
   // formatPrice is provided by utils/productUtils
@@ -406,9 +430,13 @@ export default function Products() {
                           {product.id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                          {/* XSS Protection: React automatically escapes HTML in JSX expressions.
+                              Product names are rendered as plain text, so dangerous HTML like
+                              <script>alert('xss')</script> will be displayed literally and not executed. */}
                           {product.name}
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
+                          {/* XSS Protection: React auto-escapes HTML. Description is rendered as plain text. */}
                           {product.description || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
@@ -422,6 +450,13 @@ export default function Products() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleViewDetails(product.id)}
+                              className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                              data-text="product-view-details-button"
+                            >
+                              Chi tiết
+                            </button>
                             <button
                               onClick={() => handleEdit(product)}
                               className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
@@ -455,6 +490,75 @@ export default function Products() {
           )}
         </div>
       </div>
+
+      {/* Product Details Modal */}
+      {showDetailModal && selectedProduct && (
+        <div className="fixed inset-0 bg-gray-500/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-slate-900">Chi tiết sản phẩm</h2>
+              <button
+                onClick={handleCloseDetailModal}
+                className="text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="px-6 py-4">
+              {loadingDetail ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="mt-4 text-slate-500">Đang tải thông tin...</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">ID</label>
+                      <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{selectedProduct.id}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Tên sản phẩm</label>
+                      <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{selectedProduct.name}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Giá</label>
+                      <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{formatPrice(selectedProduct.price)}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Số lượng</label>
+                      <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{selectedProduct.stockQuantity}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-1">Trạng thái</label>
+                      <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md">{selectedProduct.status || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Mô tả</label>
+                    <p className="text-sm text-slate-900 bg-slate-50 px-3 py-2 rounded-md min-h-[60px]">
+                      {selectedProduct.description || 'Không có mô tả'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-slate-200 flex justify-end">
+              <button
+                onClick={handleCloseDetailModal}
+                className="px-4 py-2 bg-slate-200 text-slate-700 text-sm font-medium rounded-md hover:bg-slate-300 transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
