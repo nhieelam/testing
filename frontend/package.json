@@ -10,8 +10,11 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "cypress open",
-    "test:e2e:ci": "cypress run"
-    
+    "test:e2e:ci": "cypress run",
+    "test:e2e:login:ci": "cypress run --spec 'cypress/e2e/login.cy.ts'",
+    "test:e2e:product-crud:ci": "cypress run --spec 'cypress/e2e/product-crud.cy.ts'",
+    "test:e2e:product-create:ci": "cypress run --spec 'cypress/e2e/product-create.cy.ts'",
+    "test:e2e:product:ci": "npm run test:e2e:product-create:ci && npm run test:e2e:product-crud:ci"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.81.1",

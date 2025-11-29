@@ -1,4 +1,4 @@
-name: Frontend E2E Tests
+name: login-e2e
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  frontend-e2e:
+  login-e2e:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,20 +25,20 @@ jobs:
         working-directory: frontend          # 👈 add this
         run: npm ci
 
-      - name: Run Cypress login and product crud tests
+      - name: Run Cypress login tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: frontend        # 👈 correct
           install: false
           start: npm run dev                 # start Vite dev server
           wait-on: 'http://localhost:5173'   # wait until app is ready
-          command: npm run test:e2e:ci       # runs cypress tests
+          command: npm run test:e2e:login:ci
 
       - name: Upload Cypress artifacts (screenshots/videos)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-e2e-report
+          name: cypress-login-report
           path: |
             frontend/cypress/screenshots
             frontend/cypress/videos

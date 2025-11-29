@@ -1,0 +1,43 @@
+name: product-e2e
+
+on:
+  # Chỉ chạy khi bạn bấm "Run workflow" trên GitHub
+  workflow_dispatch:
+
+jobs:
+  product-e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Cypress product tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: frontend
+          install: false
+          start: npm run dev
+          wait-on: 'http://localhost:5173'
+          command: npm run test:e2e:product:ci
+
+      - name: Upload Cypress artifacts (screenshots/videos)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-product-report
+          path: |
+            frontend/cypress/screenshots
+            frontend/cypress/videos
+          if-no-files-found: ignore
