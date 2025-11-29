@@ -1,4 +1,4 @@
-name: Login E2E Tests
+name: Frontend E2E Tests
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         working-directory: frontend          # 👈 add this
         run: npm ci
 
-      - name: Run Cypress login tests
+      - name: Run Cypress login and product crud tests
         uses: cypress-io/github-action@v6
         with:
           working-directory: frontend        # 👈 correct
@@ -38,7 +38,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-login-report
+          name: cypress-e2e-report
           path: |
             frontend/cypress/screenshots
             frontend/cypress/videos
