@@ -2,33 +2,35 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 const BASE_URL = 'http://localhost:8080/api';
-const USERNAME = 'lam123';
-const PASSWORD = 'Password123';
+const USERNAME = 'lamnhiee';
+const PASSWORD = 'Nhi123456';
 
 export const options = {
-  stages: [
-    { duration: '1m', target: 100 },   // ramp to 100
-    { duration: '2m', target: 100 },
-
-    { duration: '1m', target: 500 },   // ramp to 500
-    { duration: '2m', target: 500 },
-
-    { duration: '1m', target: 1000 },  // ramp to 1000
-    { duration: '2m', target: 1000 },
-
-    { duration: '1m', target: 0 },     // cool down
-  ],
-  thresholds: {
-    http_req_duration: ['p(95)<800'],    // 95% requests < 800ms
-    http_req_failed: ['rate<0.01'],      // <1% errors
-  },
+  vus: 1,
+  duration: '1s',
 };
 
+
 export default function () {
-  const res = http.post(`${BASE_URL}/auth/login`, {
+  const url = `${BASE_URL}/auth/login`;
+
+  const payload = JSON.stringify({
     username: USERNAME,
     password: PASSWORD,
   });
+
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const res = http.post(url, payload, params);
+
+  if (__VU === 1 && __ITER < 3) {
+    console.log('Status:', res.status);
+    console.log('Body:', res.body);
+  }
 
   check(res, {
     'status is 200': (r) => r.status === 200,

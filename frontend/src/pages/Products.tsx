@@ -406,9 +406,13 @@ export default function Products() {
                           {product.id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                          {/* XSS Protection: React automatically escapes HTML in JSX expressions.
+                              Product names are rendered as plain text, so dangerous HTML like
+                              <script>alert('xss')</script> will be displayed literally and not executed. */}
                           {product.name}
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
+                          {/* XSS Protection: React auto-escapes HTML. Description is rendered as plain text. */}
                           {product.description || 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">

@@ -52,32 +52,49 @@ public class AuthController {
         return ResponseEntity.ok("Register successfully");
     }
 
-    // ĐĂNG NHẬP
-@PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-    var userOpt = userRepository.findByUsername(req.getUsername());
-    if (userOpt.isEmpty()) {
-        return ResponseEntity.status(401).body("Invalid username or password");
+    /**
+     * ĐĂNG NHẬP
+     * 
+     * Security Notes:
+     * - Uses Spring Data JPA's findByUsername() which automatically uses parameterized queries
+     * - SQL injection is prevented because user input is bound as a parameter, not concatenated into SQL
+     * - Password comparison uses PasswordEncoder.matches() with hashed passwords (bcrypt)
+     * - Generic error message prevents username enumeration attacks
+     * 
+     * @param req LoginRequest containing username and password
+     * @return LoginResponse with JWT token on success, 401 with generic error on failure
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        // Spring Data JPA's findByUsername() uses parameterized queries automatically
+        // Example generated query: SELECT * FROM users WHERE username = ? 
+        // The username parameter is safely bound, preventing SQL injection
+        var userOpt = userRepository.findByUsername(req.getUsername());
+        if (userOpt.isEmpty()) {
+            // Generic error message prevents username enumeration
+            return ResponseEntity.status(401).body("Invalid username or password");
+        }
+
+        User user = userOpt.get();
+
+        // Password comparison using bcrypt - safe from timing attacks
+        if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
+            // Same generic error message for consistency
+            return ResponseEntity.status(401).body("Invalid username or password");
+        }
+
+        String token = jwtService.generateToken(
+                user.getId().toString(),
+                user.getUsername()
+        );
+
+        LoginResponse response = new LoginResponse(
+                token,
+                user.getId().toString(),
+                user.getUsername()
+        );
+
+        return ResponseEntity.ok(response);
     }
-
-    User user = userOpt.get();
-
-    if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
-        return ResponseEntity.status(401).body("Invalid username or password");
-    }
-
-    String token = jwtService.generateToken(
-            user.getId().toString(),
-            user.getUsername()
-    );
-
-    LoginResponse response = new LoginResponse(
-            token,
-            user.getId().toString(),
-            user.getUsername()
-    );
-
-    return ResponseEntity.ok(response);
-}
 
 }

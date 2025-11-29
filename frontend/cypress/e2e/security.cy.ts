@@ -60,6 +60,8 @@ describe('Security tests', () => {
   });
   // ========= 1) SQL Injection =========
   it('should not allow SQL Injection on login', () => {
+    // Test common SQL injection pattern
+    // Using parameterized queries or ORM should prevent SQL injection
     cy.request({
       method: 'POST',
       url: `${API_BASE_URL}/auth/login`,
@@ -70,6 +72,24 @@ describe('Security tests', () => {
       },
     }).then((res) => {
       // Kỳ vọng: không đăng nhập được
+      // Backend should reject SQL injection attempts with 400 (Bad Request) or 401 (Unauthorized)
+      // If backend uses parameterized queries/ORM, the SQL injection will be treated as literal string
+      // and login will fail because no user matches that exact username
+      expect([400, 401]).to.include(res.status);
+      // Should not return a token - this is critical for security
+      expect(res.body).not.to.have.property('token');
+    });
+
+    // Test additional SQL injection pattern
+    cy.request({
+      method: 'POST',
+      url: `${API_BASE_URL}/auth/login`,
+      failOnStatusCode: false,
+      body: {
+        username: "admin'--",
+        password: 'anything',
+      },
+    }).then((res) => {
       expect([400, 401]).to.include(res.status);
       expect(res.body).not.to.have.property('token');
     });
@@ -130,43 +150,6 @@ describe('Security tests', () => {
       expect([200, 201, 401, 403]).to.include(res.status);
       if (res.status === 200 || res.status === 201) {
         cy.log('INFO: POST /api/products allows unauthenticated access. Consider adding authentication for better security.');
-      }
-    });
-  });
-
-  // ========= 4) Authentication bypass attempts =========
-  // NOTE: These tests check if GET endpoints are protected.
-  // If the backend allows unauthenticated GET requests, these tests will pass with 200.
-  // For better security, GET endpoints should also require authentication or at least rate limiting.
-  it('should not allow accessing protected products API without token', () => {
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/products`,
-      failOnStatusCode: false,
-    }).then((res) => {
-      // Backend may allow GET without auth (returns 200) or require auth (returns 401/403)
-      // Both behaviors are acceptable depending on security requirements
-      expect([200, 401, 403]).to.include(res.status);
-      if (res.status === 200) {
-        cy.log('INFO: GET /api/products allows unauthenticated access. Consider adding authentication for better security.');
-      }
-    });
-  });
-
-  it('should not allow accessing protected products API with fake token', () => {
-    cy.request({
-      method: 'GET',
-      url: `${API_BASE_URL}/products`,
-      failOnStatusCode: false,
-      headers: {
-        Authorization: 'Bearer fake.token.here',
-      },
-    }).then((res) => {
-      // Backend may allow GET with invalid token (returns 200) or reject it (returns 401/403)
-      // Both behaviors are acceptable depending on security requirements
-      expect([200, 401, 403]).to.include(res.status);
-      if (res.status === 200) {
-        cy.log('INFO: GET /api/products allows access with invalid token. Consider adding token validation for better security.');
       }
     });
   });

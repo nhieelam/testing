@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Product;
 import com.example.demo.repository.ProductRepository;
+import com.example.demo.util.XssSanitizer;
 
 @RestController
 @RequestMapping("/api/products")
@@ -28,7 +30,13 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    // GET /api/products
+    /**
+     * GET /api/products
+     * 
+     * Returns all products as JSON.
+     * Product names are returned as plain text strings - no HTML transformation.
+     * XSS protection is handled by frontend output escaping (React auto-escapes HTML).
+     */
     @GetMapping
     public List<Product> getAll() {
         return productRepository.findAll();
@@ -42,19 +50,63 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build()); // 404
     }
 
-    // POST /api/products
+    /**
+     * POST /api/products
+     * 
+     * Creates a new product.
+     * 
+     * XSS Protection:
+     * - Validates product name to reject dangerous HTML/script patterns
+     * - Returns product as plain text JSON (no HTML transformation)
+     * - Frontend is responsible for output escaping (React auto-escapes)
+     * 
+     * @param product The product to create
+     * @return Created product or 400 Bad Request if validation fails
+     */
     @PostMapping
-    public Product create(@RequestBody Product product) {
+    public ResponseEntity<?> create(@RequestBody Product product) {
+        // Validate product name for XSS protection
+        XssSanitizer.ValidationResult nameValidation = 
+            XssSanitizer.validateProductName(product.getName());
+        
+        if (!nameValidation.isValid()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(nameValidation.getErrorMessage());
+        }
+
         // id sẽ tự random trong @PrePersist nếu null
-        return productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
+        return ResponseEntity.ok(savedProduct);
     }
 
-    // PUT /api/products/{id}
+    /**
+     * PUT /api/products/{id}
+     * 
+     * Updates an existing product.
+     * 
+     * XSS Protection:
+     * - Validates product name to reject dangerous HTML/script patterns
+     * - Returns product as plain text JSON (no HTML transformation)
+     * - Frontend is responsible for output escaping (React auto-escapes)
+     * 
+     * @param id The product ID to update
+     * @param payload The updated product data
+     * @return Updated product, 400 Bad Request if validation fails, or 404 Not Found
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(
+    public ResponseEntity<?> update(
             @PathVariable UUID id,
             @RequestBody Product payload
     ) {
+        // Validate product name for XSS protection
+        XssSanitizer.ValidationResult nameValidation = 
+            XssSanitizer.validateProductName(payload.getName());
+        
+        if (!nameValidation.isValid()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(nameValidation.getErrorMessage());
+        }
+
         return productRepository.findById(id)
                 .map(existing -> {
                     existing.setName(payload.getName());
