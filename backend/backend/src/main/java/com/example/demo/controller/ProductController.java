@@ -42,12 +42,23 @@ public class ProductController {
         return productRepository.findAll();
     }
 
-    // GET /api/products/{id}
+    /**
+     * GET /api/products/{id}
+     * 
+     * Gets a product by its ID.
+     * 
+     * Returns product details as JSON.
+     * Product data is returned as plain text strings - no HTML transformation.
+     * XSS protection is handled by frontend output escaping (React auto-escapes HTML).
+     * 
+     * @param id The UUID of the product to retrieve
+     * @return Product entity with 200 OK if found, or 404 Not Found if product doesn't exist
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable UUID id) {
         return productRepository.findById(id)
-                .map(ResponseEntity::ok)              // 200
-                .orElse(ResponseEntity.notFound().build()); // 404
+                .map(ResponseEntity::ok)              // 200 OK
+                .orElse(ResponseEntity.notFound().build()); // 404 Not Found
     }
 
     /**
