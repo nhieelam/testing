@@ -93,4 +93,33 @@ class AuthServiceTest {
 
         assertEquals("Invalid username or password", exception.getMessage());
     }
+    @Test
+    @DisplayName("TC4: Register thành công")
+    void testRegister_Success() {
+        com.example.demo.dto.RegisterRequest req = new com.example.demo.dto.RegisterRequest();
+        req.setUsername("newuser");
+        req.setPassword("pass123");
+        when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("pass123")).thenReturn("encodedPass");
+        authService.register(req);
+        verify(userRepository, times(1)).save(org.mockito.ArgumentMatchers.any(User.class));
+    }
+
+    @Test
+    @DisplayName("TC5: Register thất bại - Username đã tồn tại")
+    void testRegister_UsernameTaken() {
+        com.example.demo.dto.RegisterRequest req = new com.example.demo.dto.RegisterRequest();
+        req.setUsername("existinguser");
+        req.setPassword("pass123");
+
+        when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(mockUser));
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            authService.register(req);
+        });
+
+        assertEquals("Username is already taken", exception.getMessage());
+        
+        verify(userRepository, times(0)).save(org.mockito.ArgumentMatchers.any(User.class));
+    }
 }
