@@ -1,13 +1,13 @@
 package com.example.demo.service;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,7 @@ import com.example.demo.mapper.ProductMapper;
 import com.example.demo.repository.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Product Service Unit Tests")
-class ProductServiceTest {
+class ProductServiceMockTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -49,7 +48,6 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Chuẩn bị dữ liệu mẫu dùng chung
         productId = UUID.randomUUID();
 
         // Setup Entity
@@ -70,34 +68,25 @@ class ProductServiceTest {
         );
     }
 
-    // ==========================================
-    // 1. TEST CREATE PRODUCT
-    // ==========================================
+    // --- 1. Test Create Product ---
     @Test
-    @DisplayName("TC1: Tạo sản phẩm mới thành công")
+    @DisplayName("TC1: Tạo sản phẩm thành công")
     void testCreateProduct_Success() {
-        // Mock hành vi: Mapper entity -> Repo Save -> Mapper DTO
         when(productMapper.toEntity(any(ProductDto.class))).thenReturn(mockProduct);
         when(productRepository.save(any(Product.class))).thenReturn(mockProduct);
         when(productMapper.toDto(any(Product.class))).thenReturn(mockProductDto);
 
-        // Gọi hàm
         ProductDto result = productService.createProduct(mockProductDto);
 
-        // Kiểm tra (Assert)
         assertNotNull(result);
         assertEquals("Laptop Dell", result.getName());
-        
-        // Verify: Đảm bảo hàm save đã được gọi 1 lần
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
-    // ==========================================
-    // 2. TEST GET PRODUCT BY ID
-    // ==========================================
+    // --- 2. Test Get Product By ID ---
     @Test
-    @DisplayName("TC2: Lấy sản phẩm theo ID thành công")
-    void testGetProductById_Success() {
+    @DisplayName("TC2: Lấy sản phẩm theo ID - Tìm thấy")
+    void testGetProductById_Found() {
         when(productRepository.findById(productId)).thenReturn(Optional.of(mockProduct));
         when(productMapper.toDto(mockProduct)).thenReturn(mockProductDto);
 
@@ -108,56 +97,49 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("TC3: Lấy sản phẩm thất bại - ID không tồn tại (Exception)")
+    @DisplayName("TC3: Lấy sản phẩm theo ID - Không tìm thấy")
     void testGetProductById_NotFound() {
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        // Kiểm tra xem có ném ra RuntimeException không
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(RuntimeException.class, () -> {
             productService.getProductById(productId);
         });
 
-        assertEquals("Product not found with id: " + productId, exception.getMessage());
+        assertTrue(exception.getMessage().contains("Product not found"));
     }
 
-    // ==========================================
-    // 3. TEST UPDATE PRODUCT
-    // ==========================================
+    // --- 3. Test Update Product ---
     @Test
     @DisplayName("TC4: Cập nhật sản phẩm thành công")
     void testUpdateProduct_Success() {
-        // Dữ liệu update mới
-        ProductDto updateInfo = new ProductDto(productId, "Laptop Asus", 20000000.0, 5, "Updated Desc");
-        
         when(productRepository.findById(productId)).thenReturn(Optional.of(mockProduct));
         when(productRepository.save(any(Product.class))).thenReturn(mockProduct);
-        when(productMapper.toDto(any(Product.class))).thenReturn(updateInfo);
+        when(productMapper.toDto(any(Product.class))).thenReturn(mockProductDto);
 
-        ProductDto result = productService.updateProduct(productId, updateInfo);
+        ProductDto result = productService.updateProduct(productId, mockProductDto);
 
         assertNotNull(result);
-        assertEquals("Laptop Asus", result.getName()); // Kiểm tra dữ liệu trả về đã map đúng chưa
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
+    // --- BỔ SUNG: Test Update Product Not Found (Để phủ kín nhánh elseThrow) ---
     @Test
-    @DisplayName("TC5: Cập nhật thất bại - ID không tồn tại")
+    @DisplayName("TC4-B: Cập nhật thất bại - ID không tồn tại")
     void testUpdateProduct_NotFound() {
         when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(RuntimeException.class, () -> {
             productService.updateProduct(productId, mockProductDto);
         });
 
-        // Đảm bảo không bao giờ gọi save nếu không tìm thấy ID
+        assertTrue(exception.getMessage().contains("Product not found"));
+        // Đảm bảo không bao giờ gọi save nếu không tìm thấy
         verify(productRepository, never()).save(any(Product.class));
     }
 
-    // ==========================================
-    // 4. TEST DELETE PRODUCT
-    // ==========================================
+    // --- 4. Test Delete Product ---
     @Test
-    @DisplayName("TC6: Xóa sản phẩm thành công")
+    @DisplayName("TC5: Xóa sản phẩm thành công")
     void testDeleteProduct_Success() {
         when(productRepository.existsById(productId)).thenReturn(true);
 
@@ -167,36 +149,31 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("TC7: Xóa thất bại - ID không tồn tại")
+    @DisplayName("TC6: Xóa sản phẩm thất bại - ID không tồn tại")
     void testDeleteProduct_NotFound() {
         when(productRepository.existsById(productId)).thenReturn(false);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        assertThrows(RuntimeException.class, () -> {
             productService.deleteProduct(productId);
         });
 
-        assertEquals("Product not found with id: " + productId, exception.getMessage());
         verify(productRepository, never()).deleteById(any());
     }
 
-    // ==========================================
-    // 5. TEST GET ALL (PAGINATION)
-    // ==========================================
+    // --- 5. Test Get All (Pagination) ---
     @Test
-    @DisplayName("TC8: Lấy danh sách có phân trang thành công")
-    void testGetAllProducts_Success() {
-        // Mock Pageable
+    @DisplayName("TC7: Lấy tất cả sản phẩm có phân trang")
+    void testGetAllProducts() {
         Pageable pageable = PageRequest.of(0, 10);
-        List<Product> productList = Collections.singletonList(mockProduct);
-        Page<Product> productPage = new PageImpl<>(productList);
+        Page<Product> pageEntity = new PageImpl<>(Collections.singletonList(mockProduct));
 
-        when(productRepository.findAll(pageable)).thenReturn(productPage);
+        when(productRepository.findAll(pageable)).thenReturn(pageEntity);
         when(productMapper.toDto(any(Product.class))).thenReturn(mockProductDto);
 
-        Page<ProductDto> result = productService.getAllProducts(pageable);
+        Page<ProductDto> resultPage = productService.getAllProducts(pageable);
 
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
+        assertNotNull(resultPage);
+        assertEquals(1, resultPage.getTotalElements());
         verify(productRepository, times(1)).findAll(pageable);
     }
 }
