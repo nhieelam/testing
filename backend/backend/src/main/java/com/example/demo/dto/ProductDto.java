@@ -29,4 +29,10 @@ public class ProductDto {
     // THÊM 2 METHOD NÀY VÀO
     public Double getPrice() { return price; }
     public String getDescription() { return description; }
+
+    public void setId(UUID id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public void setPrice(Double price) { this.price = price; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public void setDescription(String description) { this.description = description; }
 }

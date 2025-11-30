@@ -37,7 +37,7 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private ProductMapper productMapper; // Mock thêm Mapper vì Service dùng nó
+    private ProductMapper productMapper;
 
     @InjectMocks
     private ProductService productService;

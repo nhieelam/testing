@@ -21,27 +21,21 @@ public class ProductService {
     @Autowired
     private ProductMapper productMapper;
 
-    /**
-     * Tạo sản phẩm mới
-     */
+     //Tạo sản phẩm mới
     public ProductDto createProduct(ProductDto productDto) {
         Product product = productMapper.toEntity(productDto);
         Product savedProduct = productRepository.save(product);
         return productMapper.toDto(savedProduct);
     }
 
-    /**
-     * Lấy sản phẩm theo ID
-     */
+    //Lấy sản phẩm theo ID
     public ProductDto getProductById(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
         return productMapper.toDto(product);
     }
 
-    /**
-     * Cập nhật sản phẩm
-     */
+    //Cập nhật sản phẩm
     public ProductDto updateProduct(UUID id, ProductDto productDto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
@@ -59,18 +53,14 @@ public class ProductService {
         return productMapper.toDto(updatedProduct);
     }
 
-    /**
-     * Xóa sản phẩm
-     */
+    //Xóa sản phẩm
     public void deleteProduct(UUID id) {
         if (!productRepository.existsById(id)) {
             throw new RuntimeException("Product not found with id: " + id);
         }
         productRepository.deleteById(id);
     }
-    /**
-     * Lấy tất cả sản phẩm với phân trang
-     */
+    //Lấy tất cả sản phẩm với phân trang
     public Page<ProductDto> getAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(productMapper::toDto);
