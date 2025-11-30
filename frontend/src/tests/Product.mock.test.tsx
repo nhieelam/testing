@@ -214,8 +214,6 @@ describe('Products Component - Mock Tests', () => {
 
     const deleteBtn = await screen.findByTestId('product-delete-button');
     fireEvent.click(deleteBtn);
-
-    // Verify: API delete KHÔNG được gọi
     expect(mockedProductService.deleteProduct).not.toHaveBeenCalled();
   });
 
@@ -241,7 +239,6 @@ describe('Products Component - Mock Tests', () => {
     fireEvent.click(saveBtn);
 
     // 3. Verify Error Message
-    // Lưu ý: Cần đảm bảo trong Products.tsx có đoạn setError('Không thể cập nhật...')
     const errorMsg = await screen.findByText(/Không thể cập nhật sản phẩm/i);
     expect(errorMsg).toBeInTheDocument();
   });
@@ -388,7 +385,7 @@ describe('Products Component - Mock Tests', () => {
 
   // --- TC15: AUTH REDIRECT (Chưa đăng nhập) ---
   test('TC15: Mock - Redirect về Login nếu chưa đăng nhập', async () => {
-    mockedIsAuthenticated.mockReturnValue(false); // Giả lập chưa login
+    mockedIsAuthenticated.mockReturnValue(false); 
 
     render(
       <MemoryRouter>
@@ -413,7 +410,6 @@ describe('Products Component - Mock Tests', () => {
     );
 
     // 2. Kích hoạt sự kiện 'authChanged' (giả lập thay đổi quyền/logout ở tab khác)
-    // Phải bọc trong act() vì nó gây ra update state
     act(() => {
       window.dispatchEvent(new Event('authChanged'));
     });
@@ -444,8 +440,6 @@ describe('Products Component - Mock Tests', () => {
     fireEvent.change(screen.getByTestId('product-name-input'), { target: { value: 'Test Product' } });
     fireEvent.change(screen.getByTestId('product-price-input'), { target: { value: 100 } });
     fireEvent.change(screen.getByTestId('product-quantity-input'), { target: { value: 10 } });
-
-    // Không cần submit, chỉ cần change để trigger hàm onChange
   });
 
   // --- TC18: FULL INPUT COVERAGE (Edit Inline Form) ---
@@ -474,8 +468,5 @@ describe('Products Component - Mock Tests', () => {
     // 5. Nhập Status (Cover onChange)
     const statusInput = screen.getByTestId('product-inline-status-input');
     fireEvent.change(statusInput, { target: { value: 'SOLD_OUT' } });
-
-    // Không cần Save, chỉ cần trigger onChange
   });
-
 });

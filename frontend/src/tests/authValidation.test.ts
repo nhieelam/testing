@@ -30,7 +30,7 @@ describe('Login Validation Tests', () => {
     test('TC5: Username hợp lệ (user123) - nên trả về chuỗi rỗng (không lỗi)', () => {
       expect(validateUsername('user123')).toBe('');
     });
-
+    
     test('TC6: Username hợp lệ ở biên (3 ký tự) - nên trả về chuỗi rỗng', () => {
       expect(validateUsername('abc')).toBe('');
     });

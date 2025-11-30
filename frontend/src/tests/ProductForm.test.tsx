@@ -8,7 +8,7 @@ import * as productService from '../services/productService';
 import * as authUtils from '../utils/auth';
 import { vi } from 'vitest';
 
-// SỬA: Mock productUtils
+// Mock productUtils
 vi.mock('../utils/productUtils', () => ({
   validateProductPayload: vi.fn(),
   emptyNewProduct: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock('../services/productService', () => ({
   deleteProduct: vi.fn(),
 }));
 
-// THÊM: Mock isAuthenticated
+//Mock isAuthenticated
 vi.mock('../utils/auth', () => ({
   isAuthenticated: vi.fn().mockReturnValue(true),
 }));
@@ -51,7 +51,7 @@ describe('Products Component - Form Validation Tests', () => {
       stockQuantity: Number(p.stockQuantity) || 0,
       status: p.status || 'ACTIVE',
     }));
-    // SỬA: validation thành công chỉ cần { valid: true } (Khắc phục lỗi TS2322)
+    // Mặc định validatePayload trả về hợp lệ
     mockedValidatePayload.mockReturnValue({ valid: true });
   });
 
@@ -83,7 +83,7 @@ describe('Products Component - Form Validation Tests', () => {
     const createBtn = await screen.findByRole('button', { name: /tạo sản phẩm/i });
     fireEvent.click(createBtn);
 
-    // KIỂM TRA: Hàm validatePayload đã được gọi và lỗi hiển thị
+    // Verify
     expect(mockedValidatePayload).toHaveBeenCalled();
     expect(await screen.findByText('Tên sản phẩm không được để trống')).toBeInTheDocument();
   });
@@ -112,7 +112,7 @@ describe('Products Component - Form Validation Tests', () => {
       target: { value: 'Laptop Dell' },
     });
 
-    // SỬA LỖI: Tìm input Price bằng cách sử dụng getAllByPlaceholderText ('0')[0]
+    // 2. Nhập Giá sản phẩm
     const priceInput = screen.getAllByPlaceholderText('0')[0];
 
     fireEvent.change(priceInput, {

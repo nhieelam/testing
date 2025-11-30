@@ -43,16 +43,13 @@ describe('Login Component Mock Tests', () => {
       username: 'testuser',
       userId: 'user-123',
     });
-
-    // Act: Ưu tiên dùng getByPlaceholder/Role (Cách của bạn kia) vì nó chuẩn UX hơn
-    // Nếu không tìm thấy, hãy đảm bảo input trong Login.tsx có placeholder hoặc aria-label
+    // Act
     fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'Test1234' } }); // Password đúng
+    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'Test1234' } });
     fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
 
     // Assert
     await waitFor(() => {
-        // Lấy sự chặt chẽ từ code CỦA BẠN: Kiểm tra tham số gọi hàm
         expect(mockedLoginApi).toHaveBeenCalledWith('testuser','Test1234');
         // Kiểm tra chuyển trang
         expect(mockedNavigate).toHaveBeenCalledWith('/products');
@@ -61,7 +58,7 @@ describe('Login Component Mock Tests', () => {
 
   test('TC2: Mock - Đăng nhập thất bại (sai mật khẩu)', async () => {
     // Arrange
-    mockedLoginApi.mockRejectedValue(new Error('Unauthorized')); // Giả lập lỗi từ API
+    mockedLoginApi.mockRejectedValue(new Error('Unauthorized')); 
 
     // Act
     fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
@@ -72,10 +69,6 @@ describe('Login Component Mock Tests', () => {
     await waitFor(() => {
         expect(mockedLoginApi).toHaveBeenCalledTimes(1);
         expect(mockedNavigate).not.toHaveBeenCalled();
-        
-        // Kiểm tra hiển thị lỗi (Kết hợp cả 2 cách tìm)
-        // Nếu code bạn dùng data-text="login-error", có thể dùng lại query đó nếu cấu hình configure
-        // Hoặc tìm theo text hiển thị trên màn hình:
         expect(screen.getByText(/tên đăng nhập hoặc mật khẩu không đúng/i)).toBeInTheDocument();
     });
   });
