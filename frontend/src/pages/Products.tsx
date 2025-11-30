@@ -52,7 +52,7 @@ export default function Products() {
       const authenticated = isAuthenticated()
       setIsAuthenticatedState(authenticated)
       if (!authenticated) {
-        navigate('/login')
+        navigate('/404')
       } else {
         fetchProducts()
       }
@@ -317,169 +317,169 @@ export default function Products() {
           {/* Products Table */}
           {!loading && (
             <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Tên sản phẩm
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Mô tả
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Giá
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Số lượng
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Trạng thái
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Thao tác
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-slate-200">
-                {filteredProducts.map((product) => (
-                  <tr
-                    key={product.id}
-                    className="hover:bg-slate-50 transition-colors"
-                    data-text="product-row"
-                  >
-                    {editingId === product.id ? (
-                      <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                          {product.id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            value={editForm?.name || ''}
-                            onChange={(e) => setEditForm(editForm ? { ...editForm, name: e.target.value } : null)}
-                            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Tên sản phẩm"
-                            data-text="product-inline-name-input"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            value={editForm?.description || ''}
-                            onChange={(e) => setEditForm(editForm ? { ...editForm, description: e.target.value } : null)}
-                            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Mô tả"
-                            data-text="product-inline-description-input"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            value={editForm?.price || ''}
-                            onChange={(e) => setEditForm(editForm ? { ...editForm, price: Number(e.target.value) } : null)}
-                            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            data-text="product-inline-price-input"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="number"
-                            value={editForm?.stockQuantity || ''}
-                            onChange={(e) => setEditForm(editForm ? { ...editForm, stockQuantity: Number(e.target.value) } : null)}
-                            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            data-text="product-inline-quantity-input"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <input
-                            type="text"
-                            value={editForm?.status || ''}
-                            onChange={(e) => setEditForm(editForm ? { ...editForm, status: e.target.value } : null)}
-                            className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="ACTIVE"
-                            data-text="product-inline-status-input"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={handleSave}
-                              disabled={saving}
-                              className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              data-text="product-inline-save-button"
-                            >
-                              {saving ? 'Đang lưu...' : 'Lưu'}
-                            </button>
-                            <button
-                              onClick={handleCancel}
-                              disabled={saving}
-                              className="px-3 py-1.5 bg-slate-200 text-slate-700 text-sm rounded-md hover:bg-slate-300 transition-colors disabled:opacity-50"
-                              data-text="product-inline-cancel-button"
-                            >
-                              Hủy
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                          {product.id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                          {/* XSS Protection: React automatically escapes HTML in JSX expressions.
+              <table className="w-full">
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Tên sản phẩm
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Mô tả
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Giá
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Số lượng
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Trạng thái
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+                      Thao tác
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-slate-200">
+                  {filteredProducts.map((product) => (
+                    <tr
+                      key={product.id}
+                      className="hover:bg-slate-50 transition-colors"
+                      data-text="product-row"
+                    >
+                      {editingId === product.id ? (
+                        <>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {product.id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="text"
+                              value={editForm?.name || ''}
+                              onChange={(e) => setEditForm(editForm ? { ...editForm, name: e.target.value } : null)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Tên sản phẩm"
+                              data-text="product-inline-name-input"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="text"
+                              value={editForm?.description || ''}
+                              onChange={(e) => setEditForm(editForm ? { ...editForm, description: e.target.value } : null)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Mô tả"
+                              data-text="product-inline-description-input"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="number"
+                              value={editForm?.price || ''}
+                              onChange={(e) => setEditForm(editForm ? { ...editForm, price: Number(e.target.value) } : null)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              data-text="product-inline-price-input"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="number"
+                              value={editForm?.stockQuantity || ''}
+                              onChange={(e) => setEditForm(editForm ? { ...editForm, stockQuantity: Number(e.target.value) } : null)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              data-text="product-inline-quantity-input"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <input
+                              type="text"
+                              value={editForm?.status || ''}
+                              onChange={(e) => setEditForm(editForm ? { ...editForm, status: e.target.value } : null)}
+                              className="w-full px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="ACTIVE"
+                              data-text="product-inline-status-input"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-text="product-inline-save-button"
+                              >
+                                {saving ? 'Đang lưu...' : 'Lưu'}
+                              </button>
+                              <button
+                                onClick={handleCancel}
+                                disabled={saving}
+                                className="px-3 py-1.5 bg-slate-200 text-slate-700 text-sm rounded-md hover:bg-slate-300 transition-colors disabled:opacity-50"
+                                data-text="product-inline-cancel-button"
+                              >
+                                Hủy
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {product.id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {/* XSS Protection: React automatically escapes HTML in JSX expressions.
                               Product names are rendered as plain text, so dangerous HTML like
                               <script>alert('xss')</script> will be displayed literally and not executed. */}
-                          {product.name}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
-                          {/* XSS Protection: React auto-escapes HTML. Description is rendered as plain text. */}
-                          {product.description || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                          {formatPrice(product.price)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                          {product.stockQuantity}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                          {product.status || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => handleViewDetails(product.id)}
-                              className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
-                              data-text="product-view-details-button"
-                            >
-                              Chi tiết
-                            </button>
-                            <button
-                              onClick={() => handleEdit(product)}
-                              className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-                              data-text="product-edit-button"
-                            >
-                              Sửa
-                            </button>
-                            <button
-                              onClick={() => handleDelete(product.id)}
-                              disabled={deleting === product.id}
-                              className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                              data-text="product-delete-button"
-                            >
-                              {deleting === product.id ? 'Đang xóa...' : 'Xóa'}
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                            {product.name}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-slate-500 max-w-xs truncate">
+                            {/* XSS Protection: React auto-escapes HTML. Description is rendered as plain text. */}
+                            {product.description || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {formatPrice(product.price)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                            {product.stockQuantity}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                            {product.status || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleViewDetails(product.id)}
+                                className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors"
+                                data-text="product-view-details-button"
+                              >
+                                Chi tiết
+                              </button>
+                              <button
+                                onClick={() => handleEdit(product)}
+                                className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                                data-text="product-edit-button"
+                              >
+                                Sửa
+                              </button>
+                              <button
+                                onClick={() => handleDelete(product.id)}
+                                disabled={deleting === product.id}
+                                className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-text="product-delete-button"
+                              >
+                                {deleting === product.id ? 'Đang xóa...' : 'Xóa'}
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
@@ -507,7 +507,7 @@ export default function Products() {
                 </svg>
               </button>
             </div>
-            
+
             <div className="px-6 py-4">
               {loadingDetail ? (
                 <div className="text-center py-8">

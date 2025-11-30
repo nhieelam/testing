@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import './App.css'
+import NotFoundPage from './pages/NotFoundPage'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Products from './pages/Products'
@@ -186,12 +187,12 @@ function NavBar() {
 function App() {
   return (
     <BrowserRouter>
-      <NavBar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/products" element={<Products />} />
+        <Route path="/" element={<><NavBar /><Home /></>} />
+        <Route path="/login" element={<><NavBar /><Login /></>} />
+        <Route path="/register" element={<><NavBar /><Register /></>} />
+        <Route path="/products" element={<><NavBar /><Products /></>} />
+        <Route path="/404" element={<><NotFoundPage /></>} />
       </Routes>
     </BrowserRouter>
   )
