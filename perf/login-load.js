@@ -2,33 +2,37 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 const BASE_URL = 'http://localhost:8080/api';
-const USERNAME = 'lam123';
-const PASSWORD = 'Password123';
+
+// Lấy số VUs từ biến môi trường USERS, mặc định = 100 nếu không truyền
+const USERS = Number(__ENV.USERS) || 100;
+
+const TEST_DURATION = '3m'; // 3 phút
 
 export const options = {
-  stages: [
-    { duration: '1m', target: 100 },   // ramp to 100
-    { duration: '2m', target: 100 },
+  vus: USERS,
+  duration: TEST_DURATION,
 
-    { duration: '1m', target: 500 },   // ramp to 500
-    { duration: '2m', target: 500 },
-
-    { duration: '1m', target: 1000 },  // ramp to 1000
-    { duration: '2m', target: 1000 },
-
-    { duration: '1m', target: 0 },     // cool down
-  ],
   thresholds: {
-    http_req_duration: ['p(95)<800'],    // 95% requests < 800ms
-    http_req_failed: ['rate<0.01'],      // <1% errors
+    // 95% request < 800ms
+    http_req_duration: ['p(95)<800'],
+    // Tỷ lệ lỗi < 1%
+    http_req_failed: ['rate<0.01'],
   },
 };
 
 export default function () {
-  const res = http.post(`${BASE_URL}/auth/login`, {
-    username: USERNAME,
-    password: PASSWORD,
+  const payload = JSON.stringify({
+    username: 'lamnhiee',
+    password: 'Password123',
   });
+
+  const params = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+
+  const res = http.post(`${BASE_URL}/auth/login`, payload, params);
 
   check(res, {
     'status is 200': (r) => r.status === 200,

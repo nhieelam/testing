@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 const BASE_URL = 'http://localhost:8080/api';
-const USERNAME = 'lam123';
+const USERNAME = 'lamnhiee';
 const PASSWORD = 'Password123';
 
 export const options = {
