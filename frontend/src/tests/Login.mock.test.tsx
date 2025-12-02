@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'; // Import đầy đủ từ vitest
-import Login from '../pages/Login'; // Đảm bảo đường dẫn import đúng
+import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest';
+import Login from '../pages/Login';
 import * as authService from '../services/authService';
 
 // 1. Mock authService
@@ -9,7 +9,7 @@ vi.mock('../services/authService', () => ({
   login: vi.fn(),
 }));
 
-// 2. Mock useNavigate với importActual (Cách của bạn kia - An toàn hơn)
+// 2. Mock useNavigate
 const mockedNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
@@ -22,7 +22,6 @@ vi.mock('react-router-dom', async () => {
 const mockedLoginApi = vi.mocked(authService).login;
 
 describe('Login Component Mock Tests', () => {
-  // 3. Setup & Teardown (Kết hợp cho sạch code)
   beforeEach(() => {
     vi.clearAllMocks();
     render(
@@ -36,40 +35,69 @@ describe('Login Component Mock Tests', () => {
     vi.restoreAllMocks();
   });
 
-  test('TC1: Mock - Đăng nhập thành công', async () => {
-    // Arrange
-    mockedLoginApi.mockResolvedValue({ 
-      token: 'mock-token-123', 
-      username: 'testuser',
-      userId: 'user-123',
-    });
-    // Act
-    fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'Test1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
-
-    // Assert
-    await waitFor(() => {
-        expect(mockedLoginApi).toHaveBeenCalledWith('testuser','Test1234');
-        // Kiểm tra chuyển trang
-        expect(mockedNavigate).toHaveBeenCalledWith('/products');
+  // --- Mock authService ---
+  describe('a) Mock authService.loginUser()', () => {
+    test('Kiểm tra hàm login đã được Mock (Spy)', () => {
+      // Kiểm tra xem hàm login có phải là hàm giả (mock) không
+      expect(vi.isMockFunction(mockedLoginApi)).toBe(true);
     });
   });
 
-  test('TC2: Mock - Đăng nhập thất bại (sai mật khẩu)', async () => {
-    // Arrange
-    mockedLoginApi.mockRejectedValue(new Error('Unauthorized')); 
+  // --- Test Success/Failed scenarios ---
+  describe('b) Test với mocked successful/failed responses', () => {
+    test('TC1: Mock - Đăng nhập thành công (Resolved)', async () => {
+      // Arrange
+      mockedLoginApi.mockResolvedValue({ 
+        token: 'mock-token-123', 
+        username: 'testuser',
+        userId: 'user-123',
+      });
 
-    // Act
-    fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'WrongPass1' } }); // Password sai
-    fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
+      // Act
+      fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
+      fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'Test1234' } });
+      fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
 
-    // Assert
-    await waitFor(() => {
-        expect(mockedLoginApi).toHaveBeenCalledTimes(1);
-        expect(mockedNavigate).not.toHaveBeenCalled();
-        expect(screen.getByText(/tên đăng nhập hoặc mật khẩu không đúng/i)).toBeInTheDocument();
+      // Assert UI changes
+      await waitFor(() => {
+          expect(mockedNavigate).toHaveBeenCalledWith('/products');
+      });
+    });
+
+    test('TC2: Mock - Đăng nhập thất bại (Rejected)', async () => {
+      // Arrange
+      mockedLoginApi.mockRejectedValue(new Error('Unauthorized'));
+
+      // Act
+      fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
+      fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'WrongPass1' } });
+      fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
+
+      // Assert UI changes
+      await waitFor(() => {
+          expect(screen.getByText(/tên đăng nhập hoặc mật khẩu không đúng/i)).toBeInTheDocument();
+          expect(mockedNavigate).not.toHaveBeenCalled();
+      });
+    });
+  });
+
+  // --- Verify mock calls ---
+  describe('c) Verify mock calls', () => {
+    test('TC3: Kiểm tra API được gọi đúng tham số (Verify)', async () => {
+      // Setup lại kịch bản thành công để check verify
+      mockedLoginApi.mockResolvedValue({ token: 'abc', username: 'u', userId: '1' });
+
+      fireEvent.change(screen.getByPlaceholderText(/Tên đăng nhập/i), { target: { value: 'testuser' } });
+      fireEvent.change(screen.getByPlaceholderText(/••••••••/i), { target: { value: 'Test1234' } });
+      fireEvent.click(screen.getByRole('button', { name: /đăng nhập/i }));
+
+      
+      await waitFor(() => {
+          // Kiểm tra số lần gọi
+          expect(mockedLoginApi).toHaveBeenCalledTimes(1);
+          // Kiểm tra tham số truyền vào chính xác
+          expect(mockedLoginApi).toHaveBeenCalledWith('testuser', 'Test1234');
+      });
     });
   });
 });
