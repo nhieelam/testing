@@ -1,10 +1,10 @@
-name: Login E2E Tests
+name: login-e2e
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main,new ]
   pull_request:
-    branches: [ main ]
+    branches: [ main,new ]
 
 jobs:
   login-e2e:
@@ -22,17 +22,29 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: frontend          # 👈 add this
+        working-directory: frontend        
         run: npm ci
 
       - name: Run Cypress login tests
         uses: cypress-io/github-action@v6
         with:
-          working-directory: frontend        # 👈 correct
+          working-directory: frontend      
           install: false
-          start: npm run dev                 # start Vite dev server
-          wait-on: 'http://localhost:5173'   # wait until app is ready
-          command: npm run test:e2e:ci       # runs cypress tests
+          start: npm run dev              
+          wait-on: 'http://localhost:5173' 
+          command: npm run test:e2e:login:ci
+      - name: Generate Cypress HTML report
+        if: always()
+        working-directory: frontend
+        run: npm run report:e2e
+
+      - name: Upload Cypress HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-login-html-report
+          path: frontend/cypress/reports/html
+          if-no-files-found: ignore
 
       - name: Upload Cypress artifacts (screenshots/videos)
         if: always()
