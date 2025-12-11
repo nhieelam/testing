@@ -7,10 +7,10 @@ const PASSWORD = 'Password123';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 100 },   // ramp to 100
+    { duration: '1m', target: 100 },  
     { duration: '2m', target: 100 },
 
-    { duration: '1m', target: 500 },   // ramp to 500
+    { duration: '1m', target: 500 }, 
     { duration: '2m', target: 500 },
 
     { duration: '1m', target: 1000 },  // ramp to 1000

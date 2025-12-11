@@ -1,14 +1,10 @@
 // cypress/e2e/login.cy.ts
 import { LoginPage } from "./pages/LoginPage";
-
 const loginPage = new LoginPage();
-
 describe("E2E - Login flow", () => {
   beforeEach(() => {
-    // Luôn bắt đầu tại trang login
     loginPage.visit();
 
-    // Clear storage mỗi test
     cy.clearLocalStorage();
     cy.clearCookies();
     cy.window().then((w) => {
@@ -16,7 +12,7 @@ describe("E2E - Login flow", () => {
     });
   });
 
-  it("a) Complete login flow with valid credentials", () => {
+  it("a) Hoàn thành login với thông tin hợp lệ", () => {
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 200,
       body: {
@@ -33,7 +29,6 @@ describe("E2E - Login flow", () => {
 
     cy.url().should("include", "/products");
 
-    // kiểm tra token được lưu trong sessionStorage
     cy.window().then((w) => {
       const token = w.sessionStorage.getItem("token");
       expect(token).to.eq("fake-jwt-token");
@@ -43,10 +38,8 @@ describe("E2E - Login flow", () => {
   });
 
 
-  // b) Test validation messages (0.5 điểm)
   it("b1) Hiển thị lỗi khi để trống tên đăng nhập và mật khẩu", () => {
     loginPage.submit();
-
     loginPage
       .validationMessage("username")
       .should("be.visible")
@@ -56,10 +49,6 @@ describe("E2E - Login flow", () => {
       .should("be.visible")
       .and("contain", "Mật khẩu là bắt buộc");
   });
-  it('should fail to test screenshot', () => {
-    expect(true).to.equal(false)
-  })
-  
 
   it("b2) Hiển thị lỗi khi tên đăng nhập không hợp lệ", () => {
     loginPage.fillForm("sai-dinh-dang", "Password123");
@@ -135,18 +124,14 @@ describe("E2E - Login flow", () => {
   });
 
 
-  // d) Test UI elements interactions (0.5 điểm)
   it("d1) Nút show/hide password hoạt động đúng", () => {
     loginPage.passwordInput().type("Password123");
 
-    // default là password
     loginPage.passwordInput().should("have.attr", "type", "password");
 
-    // click icon show password
     loginPage.showPasswordButton().click();
     loginPage.passwordInput().should("have.attr", "type", "text");
 
-    // click lần nữa để ẩn
     loginPage.showPasswordButton().click();
     loginPage.passwordInput().should("have.attr", "type", "password");
   });
