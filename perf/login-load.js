@@ -13,14 +13,14 @@ export const options = {
     { duration: '1m', target: 500 }, 
     { duration: '2m', target: 500 },
 
-    { duration: '1m', target: 1000 },  // ramp to 1000
+    { duration: '1m', target: 1000 },  
     { duration: '2m', target: 1000 },
 
-    { duration: '1m', target: 0 },     // cool down
+    { duration: '1m', target: 0 },   
   ],
   thresholds: {
-    http_req_duration: ['p(95)<800'],    // 95% requests < 800ms
-    http_req_failed: ['rate<0.01'],      // <1% errors
+    http_req_duration: ['p(95)<800'],  
+    http_req_failed: ['rate<0.01'],   
   },
 };
 
