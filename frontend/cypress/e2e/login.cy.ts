@@ -1,4 +1,3 @@
-// cypress/e2e/login.cy.ts
 import { LoginPage } from "./pages/LoginPage";
 
 const loginPage = new LoginPage();

@@ -1,11 +1,10 @@
-// cypress/e2e/pages/LoginPage.ts
 export class LoginPage {
   visit() {
     cy.visit("/login");
   }
 
   emailInput() {
-    return cy.get('[data-text="login-username"]');       // chỉnh theo code của bạn
+    return cy.get('[data-text="login-username"]');     
   }
 
   passwordInput() {
