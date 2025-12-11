@@ -16,10 +16,6 @@ export class LoginPage {
     return cy.get('[data-text="login-submit"]');
   }
 
-  rememberMeCheckbox() {
-    return cy.get('[data-text="login-remember"]');
-  }
-
   showPasswordButton() {
     return cy.get('[data-text="toggle-password"]');
   }

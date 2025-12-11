@@ -52,7 +52,7 @@ export default function Register() {
 					{/* Rules Note */}
 					<div className="text-sm text-slate-300 px-1">
 						<ul className="list-disc pl-5">
-							<li>Username: 3-50 ký tự, chỉ chứa a-z, A-Z, 0-9, '-', '.', '_'</li>
+							<li>Username: 3-50 ký tự, chỉ chứa a-z, A-Z, 0-9,  '_'</li>
 							<li>Mật khẩu: 6-100 ký tự, phải có cả chữ và số</li>
 						</ul>
 					</div>
