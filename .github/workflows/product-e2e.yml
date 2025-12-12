@@ -1,13 +1,14 @@
-name: login-e2e
+name: product-e2e
 
 on:
   push:
     branches: [ main, new ]
   pull_request:
     branches: [ main, new ]
+  workflow_dispatch:
 
 jobs:
-  login-e2e:
+  product-e2e:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,15 +26,15 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      - name: Run Cypress login tests
+      - name: Run Cypress product tests
         uses: cypress-io/github-action@v6
         continue-on-error: true          
         with:
-          working-directory: frontend  
-          install: false          
-          start: npm run dev             
-          wait-on: 'http://localhost:5173' 
-          command: npx cypress run --spec cypress/e2e/login.cy.ts
+          working-directory: frontend
+          install: false                
+          start: npm run dev          
+          wait-on: 'http://localhost:5173'
+          command: npm run test:e2e:product:ci
 
       - name: Generate Cypress HTML report
         if: always()
@@ -44,7 +45,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-login-html-report
+          name: cypress-product-html-report
           path: frontend/cypress/reports/html
           if-no-files-found: ignore
 
@@ -52,7 +53,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cypress-login-report
+          name: cypress-product-report
           path: |
             frontend/cypress/screenshots
             frontend/cypress/videos

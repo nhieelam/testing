@@ -15,7 +15,6 @@ describe("Product - Create / Edit / Delete", () => {
       status: "ACTIVE",
     };
 
-    // Giả lập user đã đăng nhập (bypass màn login)
     cy.visit("/");
     cy.window().then((w) => {
       w.sessionStorage.setItem("token", "fake-token");
@@ -25,7 +24,6 @@ describe("Product - Create / Edit / Delete", () => {
 
     let getProductsCall = 0;
 
-    // Lần 1: vào trang -> list rỗng, Lần 2: sau khi tạo -> có sản phẩm mới
     cy.intercept("GET", "**/api/products", (req) => {
       getProductsCall += 1;
       if (getProductsCall === 1) {
@@ -52,7 +50,6 @@ describe("Product - Create / Edit / Delete", () => {
     cy.wait("@createProduct");
     cy.wait("@getProducts");
 
-    // quay lại list, kiểm tra có sản phẩm mới
     listPage.rowByName(newProduct.name).should("exist");
   });
 });

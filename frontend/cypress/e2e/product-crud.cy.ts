@@ -18,7 +18,6 @@ describe("Product - E2E CRUD Scenarios", () => {
       w.sessionStorage.setItem("isAuthenticated", "true");
     });
 
-    // mock API get products để luôn có data ổn định
     let products = [...baseProducts];
 
     cy.intercept("GET", "**/api/products", (req) => {
@@ -79,7 +78,6 @@ describe("Product - E2E CRUD Scenarios", () => {
     cy.wait("@getProducts");
   });
 
-  // a) Test Create product flow (0.5 điểm)
   it("a) Create product flow", () => {
     listPage.createButton().click();
 
@@ -92,13 +90,10 @@ describe("Product - E2E CRUD Scenarios", () => {
 
     cy.wait("@createProduct");
 
-    // quay lại list → kiểm tra row mới xuất hiện
     listPage.rowByName("Sting Dâu").should("exist");
   });
 
-  // b) Test Read/List products (0.5 điểm)
   it("b) Read/List products", () => {
-    // đã load data ở beforeEach
     listPage.rows().should("have.length", baseProducts.length);
     listPage.rowByName("Coca Cola").should("exist");
     listPage.rowByName("Pepsi").should("exist");
@@ -111,38 +106,29 @@ describe("Product - E2E CRUD Scenarios", () => {
     listPage.inlineSaveButton("Coca Cola").click();
 
     cy.wait("@updateProduct");
-    // Wait for the GET request that refreshes the list after update
     cy.wait("@getProducts");
 
-    // kiểm tra UI đã update giá mới (price is formatted as currency: 18000 -> "18.000 ₫" in Vietnamese locale)
     listPage
       .rowByName("Coca Cola")
       .should("contain", "18.000");
   });
 
-  // d) Test Delete product (0.5 điểm)
   it("d) Delete product", () => {
-    // Xác nhận dialog trình duyệt
     cy.on("window:confirm", () => true);
 
     listPage.deleteButtonFor("Pepsi").click();
 
     cy.wait("@deleteProduct");
-    // Wait for the GET request that refreshes the list after deletion
     cy.wait("@getProducts");
 
-    // Check that no rows contain "Pepsi"
     listPage.rows().should("not.contain.text", "Pepsi");
   });
 
-  // e) Test Search/Filter functionality (0.5 điểm)
   it("e) Search / Filter products", () => {
-    // gõ 'coca' → chỉ còn hàng Coca Cola
     listPage.search("coca");
 
     listPage.rows().should("have.length", 1);
     listPage.rowByName("Coca Cola").should("exist");
-    // Check that no rows contain "Pepsi"
     listPage.rows().should("not.contain.text", "Pepsi");
   });
 });
