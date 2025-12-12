@@ -27,12 +27,12 @@ jobs:
 
       - name: Run Cypress login tests
         uses: cypress-io/github-action@v6
-        continue-on-error: true          # vẫn cho pipeline chạy tiếp để generate report
+        continue-on-error: true          
         with:
-          working-directory: frontend    # chạy trong thư mục frontend
-          install: false                 # đã npm ci ở bước trên rồi
-          start: npm run dev             # start Vite dev server
-          wait-on: 'http://localhost:5173' # đợi server lên rồi mới chạy test
+          working-directory: frontend  
+          install: false          
+          start: npm run dev             
+          wait-on: 'http://localhost:5173' 
           command: npx cypress run --spec cypress/e2e/login.cy.ts
 
       - name: Generate Cypress HTML report

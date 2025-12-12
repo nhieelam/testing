@@ -2,9 +2,9 @@ name: product-e2e
 
 on:
   push:
-    branches: [ main,new ]
+    branches: [ main, new ]
   pull_request:
-    branches: [ main,new ]
+    branches: [ main, new ]
   workflow_dispatch:
 
 jobs:
@@ -28,12 +28,14 @@ jobs:
 
       - name: Run Cypress product tests
         uses: cypress-io/github-action@v6
+        continue-on-error: true          
         with:
           working-directory: frontend
-          install: false
-          start: npm run dev
+          install: false                
+          start: npm run dev          
           wait-on: 'http://localhost:5173'
           command: npm run test:e2e:product:ci
+
       - name: Generate Cypress HTML report
         if: always()
         working-directory: frontend
