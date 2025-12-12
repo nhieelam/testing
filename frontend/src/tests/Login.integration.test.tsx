@@ -22,7 +22,6 @@ vi.mock("react-router-dom", async () => {
 describe("Login Component Tests - a) Rendering and User Interactions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
   });
 
   // TC1: Render UI đúng
@@ -59,6 +58,7 @@ describe("Login Component Tests - a) Rendering and User Interactions", () => {
       expect(submit).toHaveTextContent("Đang đăng nhập...");
     });
   });
+
 
   // TC3: Tương tác với trường nhập mật khẩu (tính năng ẩn/hiển thị mật khẩu)
   test("TC3: Kiểm tra tính năng ẩn/hiển thị mật khẩu trong trường nhập", async () => {
@@ -111,7 +111,6 @@ describe("Login Component Tests - a) Rendering and User Interactions", () => {
 describe("Login Component Tests - b) Form Submission and API Calls", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
   });
 
   // TC1: Submit form hợp lệ → gọi API thành công
@@ -167,22 +166,7 @@ describe("Login Component Tests - b) Form Submission and API Calls", () => {
     await waitFor(() => {
       expect(apiLogin).not.toHaveBeenCalled();
     });
-
-    const validationTexts = [
-      "Mật khẩu không hợp lệ",
-      "Mật khẩu phải có ít nhất 8 ký tự",
-      "Mật khẩu phải chứa chữ hoa và số",
-    ];
-    const anyValidationShown = validationTexts.some((txt) => {
-      try {
-        return !!screen.getByText(new RegExp(txt, "i"));
-      } catch {
-        return false;
-      }
-    });
-    if (anyValidationShown) {
-      expect(anyValidationShown).toBeTruthy();
-    }
+    expect(screen.getByText(/Mật khẩu phải từ 6 đến 100 ký tự/i)).toBeInTheDocument();
   });
 
 
@@ -225,7 +209,6 @@ describe("Login Component Tests - b) Form Submission and API Calls", () => {
 describe("Login Component Tests - c) Error Handling and Success Messages", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorage.clear();
   });
 
   // Kiểm tra thông báo thành công khi đăng nhập thành công
