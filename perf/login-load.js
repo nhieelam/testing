@@ -24,12 +24,12 @@ export const options = {
   },
 };
 export default function () {
-  const res = http.post(`${BASE_URL}/auth/login`, {
-    username: USERNAME,
-    password: PASSWORD,
-  });
+  const res = http.post(`${BASE_URL}/auth/login`,{
+    username :USERNAME,
+    password : PASSWORD
+  })
   check(res, {
-    'status is 200': (r) => r.status === 200,
-  });
-  sleep(1);
+    'status is 200' : (r) => r.status === 200
+  })
+  sleep(1)
 }

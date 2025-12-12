@@ -2,7 +2,8 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 const BASE_URL = 'http://localhost:8080/api';
-
+const USERNAME = 'lam123';
+const PASSWORD = 'Password123';
 export const options = {
   stages: [
     { duration: '1m', target: 5 },   
@@ -24,18 +25,12 @@ export const options = {
 };
 
 export default function () {
-  const payload = JSON.stringify({
-    username: 'lamnhiee',
-    password: 'Password123',
-  });
 
-  const params = {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  };
 
-  const res = http.post(`${BASE_URL}/auth/login`, payload, params);
+  const res = http.post(`${BASE_URL}/auth/login`, {
+    username :USERNAME,
+    password : PASSWORD
+  })
 
   check(res, {
     'status is 200': (r) => r.status === 200,
