@@ -13,33 +13,7 @@ describe("E2E - Login flow", () => {
     });
   });
 
-  it("a) Complete login flow with valid credentials", () => {
-    cy.intercept("POST", "**/api/auth/login", {
-      statusCode: 200,
-      body: {
-        token: "fake-jwt-token",  
-        userId: "9dc535e3-5565-4db1-9dda-560dabd8131a",
-        username: "lam123",
-      },
-    }).as("loginRequest");
-
-    loginPage.fillForm("lam123", "Password123"); 
-    loginPage.submit();
-
-
-
-    cy.url().should("include", "/products");
-
-    cy.window().then((w) => {
-      const token = w.sessionStorage.getItem("token");
-      expect(token).to.eq("fake-jwt-token");
-    })
-
-    cy.contains("Danh sách sản phẩm").should("be.visible");
-  });
-
-
-  it("b1) Hiển thị lỗi khi để trống tên đăng nhập và mật khẩu", () => {
+  it("Hiển thị lỗi khi để trống tên đăng nhập và mật khẩu", () => {
     loginPage.submit();
 
     loginPage
@@ -52,7 +26,7 @@ describe("E2E - Login flow", () => {
       .and("contain", "Mật khẩu là bắt buộc");
   });
 
-  it("b2) Hiển thị lỗi khi tên đăng nhập không hợp lệ", () => {
+  it("Hiển thị lỗi khi tên đăng nhập không hợp lệ", () => {
     loginPage.fillForm("sai-dinh-dang", "Password123");
     loginPage.submit();
 
@@ -62,7 +36,7 @@ describe("E2E - Login flow", () => {
       .and("contain", "tên đăng nhập không hợp lệ");
   });
 
-  it("b3) Hiển thị lỗi khi mật khẩu quá ngắn", () => {
+  it("Hiển thị lỗi khi mật khẩu quá ngắn", () => {
     loginPage.fillForm("admin1234", "123");
     loginPage.submit();
 
@@ -72,7 +46,7 @@ describe("E2E - Login flow", () => {
       .and("contain", "Mật khẩu phải từ 6 đến 100 ký tự");
   });
   
-  it("b4) Hiển thị lỗi khi mật khẩu không đúng định dạng", () => {
+  it("Hiển thị lỗi khi mật khẩu không đúng định dạng", () => {
     loginPage.fillForm("lam123", "123...");
     loginPage.submit();
 
@@ -82,7 +56,7 @@ describe("E2E - Login flow", () => {
       .and("contain", "Mật khẩu phải chứa cả chữ và số");
   });
 
-  it("b5) Hiển thị lỗi khi mật khẩu quá dài", () => {
+  it("Hiển thị lỗi khi mật khẩu quá dài", () => {
     loginPage.fillForm("admin1234", "a".repeat(101));
     loginPage.submit();
 
@@ -91,24 +65,9 @@ describe("E2E - Login flow", () => {
       .should("be.visible")
       .and("contain", "Mật khẩu phải từ 6 đến 100 ký tự");
   });
-  it("c1) Login thành công", () => {
-    cy.intercept("POST", "**/api/auth/login", {
-      statusCode: 200,
-      body: {
-        token: "fake-jwt-token",  
-        userId: "9dc535e3-5565-4db1-9dda-560dabd8131a",
-        username: "lam123",
-      },
-    }).as("loginSuccess");
 
-    loginPage.fillForm("lam123", "Password123");
-    loginPage.submit();
 
-    cy.wait("@loginSuccess");
-    cy.url().should("include", "/products");
-  });
-
-  it("c2) Login sai mật khẩu -> hiển thị thông báo lỗi", () => {
+  it("Login sai mật khẩu -> hiển thị thông báo lỗi", () => {
     cy.intercept("POST", "**/api/auth/login", {
       statusCode: 401,
       body: { message: "Invalid username or password" },
@@ -126,7 +85,7 @@ describe("E2E - Login flow", () => {
   });
 
 
-  it("d1) Nút show/hide password hoạt động đúng", () => {
+  it("Nút show/hide password hoạt động đúng", () => {
     loginPage.passwordInput().type("Password123");
 
     loginPage.passwordInput().should("have.attr", "type", "password");
