@@ -53,7 +53,7 @@ describe("E2E - Login flow", () => {
     loginPage
       .validationMessage("password")
       .should("be.visible")
-      .and("contain", "Mật khẩu phải chứa cả chữ và số");
+      .and("contain", "Mật khẩu phải chứa cả chữ và sốô");
   });
 
   it("Hiển thị lỗi khi mật khẩu quá dài", () => {
