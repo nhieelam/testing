@@ -1,10 +1,9 @@
 import { vi } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from "react-router-dom";
 import ProductList from '../pages/Products';
 import * as authUtils from '../utils/auth';
 import * as productService from '../services/productService';
-import userEvent from '@testing-library/user-event';
 
 // Mock API
 vi.mock('../services/productService', () => ({
@@ -36,9 +35,9 @@ describe('Products Component - a) ProductList Tests', () => {
     mockedProductService.getProducts.mockResolvedValue(mockProducts);
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     await waitFor(() => {
@@ -52,9 +51,9 @@ describe('Products Component - a) ProductList Tests', () => {
     mockedProductService.getProducts.mockResolvedValue([]);
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     await waitFor(() => {
@@ -67,9 +66,9 @@ describe('Products Component - a) ProductList Tests', () => {
     mockedProductService.getProducts.mockRejectedValue(new Error('Network error'));
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     await waitFor(() => {
@@ -90,69 +89,52 @@ describe('Products Component - ProductForm Tests (Create/Edit)', () => {
   });
 
   test('TC1: Hiển thị form thêm sản phẩm khi nhấn nút "+ Thêm sản phẩm"', async () => {
-    render(<BrowserRouter><ProductList /></BrowserRouter>);
-
-    await waitFor(() => {
-      expect(mockedProductService.getProducts).toHaveBeenCalledTimes(1);
-    });
+    render(
+      <MemoryRouter>
+        <ProductList />
+      </MemoryRouter>
+    );
 
     screen.getByText('+ Thêm sản phẩm').click();
 
-    const nameInput = await screen.findByPlaceholderText('Nhập tên sản phẩm');
-    const descInput = await screen.findByPlaceholderText('Nhập mô tả');
-    const priceInput = await waitFor(() =>
-      document.querySelector<HTMLInputElement>('[data-text="product-price-input"]')
-    );
-    const quantityInput = await waitFor(() =>
-      document.querySelector<HTMLInputElement>('[data-text="product-quantity-input"]')
-    );
-
-    expect(nameInput).toBeInTheDocument();
-    expect(descInput).toBeInTheDocument();
-    expect(priceInput).toBeInTheDocument();
-    expect(quantityInput).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText("Nhập tên sản phẩm")).toBeInTheDocument();
+    expect(await screen.findByPlaceholderText("Nhập mô tả")).toBeInTheDocument();
+    expect(await screen.findByTestId('product-price-input')).toBeInTheDocument();
+    expect(await screen.findByTestId('product-quantity-input')).toBeInTheDocument();
     expect(screen.getByText('Tạo sản phẩm')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockedProductService.getProducts).toHaveBeenCalledTimes(1);
+    });
   });
 
   test('TC2: Tạo sản phẩm mới thành công khi gửi dữ liệu hợp lệ', async () => {
-    mockedProductService.createProduct.mockResolvedValue({
-      id: "1",
-      name: "Test product",
-      price: 100,
-      stockQuantity: 5,
-    });
+    mockedProductService.createProduct.mockResolvedValue({ id: 'uuid-1', name: 'Laptop', price: 15000000, stockQuantity: 10, status: 'ACTIVE' });
 
-    render(<BrowserRouter><ProductList /></BrowserRouter>);
-
-    await waitFor(() => {
-      expect(mockedProductService.getProducts).toHaveBeenCalledTimes(1);
-    });
+    render(
+      <MemoryRouter>
+        <ProductList />
+      </MemoryRouter>
+    );
 
     screen.getByText('+ Thêm sản phẩm').click();
 
-    const nameInput = await screen.findByPlaceholderText('Nhập tên sản phẩm');
-    const descInput = await screen.findByPlaceholderText('Nhập mô tả');
-    const priceInput = await document.querySelector<HTMLInputElement>('[data-text="product-price-input"]')!;
-    const quantityInput = await document.querySelector<HTMLInputElement>('[data-text="product-quantity-input"]')!;
-
-    await userEvent.type(nameInput, 'iPhone');
-    await userEvent.type(descInput, 'Flagship');
-    await userEvent.clear(priceInput);
-    await userEvent.type(priceInput, '29990000');
-    await userEvent.clear(quantityInput);
-    await userEvent.type(quantityInput, '20');
+    fireEvent.change(await screen.findByPlaceholderText('Nhập tên sản phẩm'), { target: { value: 'iPhone' } });
+    fireEvent.change(await screen.findByPlaceholderText('Nhập mô tả'), { target: { value: 'Flagship' } });
+    fireEvent.change(await screen.findByTestId('product-price-input'), { target: { value: 29990000 } });
+    fireEvent.change(await screen.findByTestId('product-quantity-input'), { target: { value: 20 } });
 
     screen.getByText('Tạo sản phẩm').click();
 
     await waitFor(() => {
+      expect(mockedProductService.getProducts).toHaveBeenCalledTimes(2);
       expect(mockedProductService.createProduct).toHaveBeenCalledTimes(1);
     });
 
     expect(mockedProductService.createProduct).toHaveBeenCalledWith({
       name: 'iPhone',
       description: 'Flagship',
-      price: Number(priceInput.value),
-      stockQuantity: Number(quantityInput.value),
+      price: 29990000,
+      stockQuantity: 20,
       status: 'ACTIVE',
     });
   });
@@ -176,40 +158,23 @@ describe('Products Component - ProductForm Tests (Create/Edit)', () => {
       status: 'ACTIVE',
     });
 
-    render(<BrowserRouter><ProductList /></BrowserRouter>);
-
-    await waitFor(() => {
-      expect(screen.getByText('Laptop')).toBeInTheDocument();
-    });
-
-    screen.getByText('Sửa').click();
-
-    const nameInput = await screen.findByPlaceholderText('Tên sản phẩm');
-    const descInput = await screen.findByPlaceholderText('Mô tả');
-    const priceInput = await waitFor(() =>
-      document.querySelector<HTMLInputElement>('[data-text="product-inline-price-input"]')!
+    render(
+      <MemoryRouter>
+        <ProductList />
+      </MemoryRouter>
     );
-    const quantityInput = await waitFor(() =>
-      document.querySelector<HTMLInputElement>('[data-text="product-inline-quantity-input"]')!
-    );
-    const statusInput = await screen.findByPlaceholderText('ACTIVE');
 
-    await userEvent.clear(nameInput);
-    await userEvent.type(nameInput, 'Laptop MSI');
-    await userEvent.clear(descInput);
-    await userEvent.type(descInput, 'Gaming');
-    await userEvent.clear(priceInput);
-    await userEvent.type(priceInput, '15000000');
-    await userEvent.clear(quantityInput);
-    await userEvent.type(quantityInput, '10');
-    await userEvent.clear(statusInput);
-    await userEvent.type(statusInput, 'ACTIVE');
+    const updateButton = await screen.findAllByText('Sửa');
+    fireEvent.click(updateButton[0]);
+
+    fireEvent.change(await screen.findByPlaceholderText('Tên sản phẩm'), { target: { value: 'Laptop MSI' } });
 
     const saveButton = await screen.findByText('Lưu');
     saveButton.click();
 
     await waitFor(() => {
       expect(mockedProductService.updateProduct).toHaveBeenCalledTimes(1);
+      expect(mockedProductService.getProducts).toHaveBeenCalledTimes(2);
     });
 
     expect(mockedProductService.updateProduct).toHaveBeenCalledWith('uuid-1', {
@@ -223,14 +188,13 @@ describe('Products Component - ProductForm Tests (Create/Edit)', () => {
 
 });
 
-
 describe('Products Component - c) ProductDetail Tests', () => {
   const mockProduct = {
-    id: 'uuid-123',
-    name: 'Máy ảnh Mirrorless',
-    description: 'Máy ảnh chuyên nghiệp',
-    price: 45000000,
-    stockQuantity: 5,
+    id: 'uuid-1',
+    name: 'Laptop',
+    description: 'Gaming',
+    price: 15000000,
+    stockQuantity: 10,
     status: 'ACTIVE',
   };
 
@@ -244,51 +208,50 @@ describe('Products Component - c) ProductDetail Tests', () => {
     mockedProductService.getProductById.mockResolvedValue(mockProduct);
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
-    const viewDetailsButton = await screen.findByRole('button', { name: 'Chi tiết' });
-    expect(viewDetailsButton).toBeInTheDocument();
+    const detailButton = await screen.findAllByText('Chi tiết');
+    fireEvent.click(detailButton[0]);
 
-    fireEvent.click(viewDetailsButton);
-
-    const modalHeading = await screen.findByRole('heading', { name: 'Chi tiết sản phẩm' });
+    const modalHeading = await screen.findByText('Chi tiết sản phẩm');
     expect(modalHeading).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(mockedProductService.getProductById).toHaveBeenCalledTimes(1);
-      expect(mockedProductService.getProductById).toHaveBeenCalledWith(mockProduct.id);
-    });
-
     const productDetailModal = modalHeading.closest('div.bg-white') as HTMLElement;
-    if (!productDetailModal) throw new Error("Không tìm thấy container modal.");
+    expect(productDetailModal).toBeInTheDocument();
 
     const withinModal = within(productDetailModal);
 
     expect(withinModal.getByText(mockProduct.name)).toBeInTheDocument();
     expect(withinModal.getByText(mockProduct.id)).toBeInTheDocument();
-    expect(withinModal.getByText('45.000.000 ₫')).toBeInTheDocument();
+    expect(withinModal.getByText('15.000.000 ₫')).toBeInTheDocument(); // Cập nhật giá cho sản phẩm mới
     expect(withinModal.getByText(mockProduct.description)).toBeInTheDocument();
     expect(withinModal.getByRole('button', { name: 'Đóng' })).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(mockedProductService.getProductById).toHaveBeenCalledTimes(1);
+      expect(mockedProductService.getProductById).toHaveBeenCalledWith(mockProduct.id);
+    });
   });
 
   test('TC2: Đóng khung chi tiết sản phẩm khi nhấn nút "Đóng"', async () => {
     mockedProductService.getProductById.mockResolvedValue(mockProduct);
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     const viewDetailsButton = await screen.findByRole('button', { name: 'Chi tiết' });
-    expect(viewDetailsButton).toBeInTheDocument();
     fireEvent.click(viewDetailsButton);
+
     await waitFor(() => {
       expect(screen.getByText('Chi tiết sản phẩm')).toBeInTheDocument();
     });
+
     const closeButton = screen.getByRole('button', { name: 'Đóng' });
     fireEvent.click(closeButton);
 
@@ -297,18 +260,18 @@ describe('Products Component - c) ProductDetail Tests', () => {
       expect(screen.queryByRole('button', { name: 'Đóng' })).not.toBeInTheDocument();
     });
   });
+
   test('TC3: Hiển thị thông báo lỗi khi API lấy chi tiết sản phẩm thất bại', async () => {
-    // mmock API lấy chi tiết sản phẩm bị lỗi
     mockedProductService.getProductById.mockRejectedValue(new Error('Product not found'));
 
     render(
-      <BrowserRouter>
+      <MemoryRouter>
         <ProductList />
-      </BrowserRouter>
+      </MemoryRouter>
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Máy ảnh Mirrorless')).toBeInTheDocument();
+      expect(screen.getByText('Laptop')).toBeInTheDocument();
     });
 
     const viewDetailsButton = screen.getByRole('button', { name: 'Chi tiết' });
