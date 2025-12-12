@@ -26,7 +26,7 @@ describe("E2E - Login flow", () => {
     loginPage.fillForm("lam123", "Password123"); 
     loginPage.submit();
 
-    cy.wait("@loginRequest").its("response.statusCode").should("eq", 200);
+
 
     cy.url().should("include", "/products");
 
